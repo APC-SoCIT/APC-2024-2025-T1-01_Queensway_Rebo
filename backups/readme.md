@@ -1,1 +1,2 @@
-Backup folder
+Folder for Frappe/ERPNext Backups
+
