@@ -14,20 +14,20 @@ $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
 // Pagination settings
 $limit = 10; // Products per page
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
 // Search functionality
 $search_query = "";
 if (isset($_GET['search']) && !empty($_GET['search'])) {
     $search_query = mysqli_real_escape_string($dbconn, $_GET['search']);
-    
+
     // Search by ID, Name
     $query = "SELECT * FROM products 
               WHERE id LIKE '%$search_query%' 
               OR name LIKE '%$search_query%' 
               LIMIT $limit OFFSET $offset";
-              
+
     $total_query = "SELECT COUNT(*) as total FROM products 
                     WHERE id LIKE '%$search_query%' 
                     OR name LIKE '%$search_query%'";
@@ -43,21 +43,23 @@ $total_pages = ceil($total_results / $limit);
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Admin Panel</title>
-    
+
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body>
-<?php include 'navbar.php'; ?>
+    <?php include 'navbar.php'; ?>
 
     <div class="container-fluid mt-5">
         <div class="row">
-        <?php include 'sidebar.php'; ?>
+            <?php include 'sidebar.php'; ?>
 
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <h1 class="mt-3">Manage Products</h1>
@@ -69,18 +71,20 @@ $total_pages = ceil($total_results / $limit);
                     </div>
                     <div class="col-md-6">
                         <form action="" method="GET" class="d-flex">
-                            <input type="text" class="form-control me-2" name="search" placeholder="Search" value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
+                            <input type="text" class="form-control me-2" name="search" placeholder="Search"
+                                value="<?php echo isset($_GET['search']) ? $_GET['search'] : ''; ?>">
                             <button type="submit" class="btn btn-primary">Search</button>
                         </form>
                     </div>
                 </div>
                 <hr>
-                
+
                 <table class='table table-striped'>
                     <thead>
                         <tr>
                             <th>Product ID</th>
                             <th>Product Name</th>
+                            <th>Quantity</th>
                             <th>Date Created</th>
                             <th>Actions</th>
                         </tr>
@@ -92,6 +96,7 @@ $total_pages = ceil($total_results / $limit);
                                 echo "<tr>
                                         <td>{$row['id']}</td>
                                         <td>{$row['name']}</td>
+                                        <td>{$row['quantity']}</td>
                                         <td>{$row['date_created']}</td>
                                         <td>
                                             <form method='POST' action='editproductpage.php' class='d-inline'>
@@ -120,22 +125,26 @@ $total_pages = ceil($total_results / $limit);
                                 <a class="page-link" href="?page=1&search=<?php echo $search_query; ?>">First</a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page=<?php echo $page - 1; ?>&search=<?php echo $search_query; ?>">Previous</a>
+                                <a class="page-link"
+                                    href="?page=<?php echo $page - 1; ?>&search=<?php echo $search_query; ?>">Previous</a>
                             </li>
                         <?php endif; ?>
 
                         <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                             <li class="page-item <?php echo ($i == $page) ? 'active' : ''; ?>">
-                                <a class="page-link" href="?page=<?php echo $i; ?>&search=<?php echo $search_query; ?>"><?php echo $i; ?></a>
+                                <a class="page-link"
+                                    href="?page=<?php echo $i; ?>&search=<?php echo $search_query; ?>"><?php echo $i; ?></a>
                             </li>
                         <?php endfor; ?>
 
                         <?php if ($page < $total_pages): ?>
                             <li class="page-item">
-                                <a class="page-link" href="?page=<?php echo $page + 1; ?>&search=<?php echo $search_query; ?>">Next</a>
+                                <a class="page-link"
+                                    href="?page=<?php echo $page + 1; ?>&search=<?php echo $search_query; ?>">Next</a>
                             </li>
                             <li class="page-item">
-                                <a class="page-link" href="?page=<?php echo $total_pages; ?>&search=<?php echo $search_query; ?>">Last</a>
+                                <a class="page-link"
+                                    href="?page=<?php echo $total_pages; ?>&search=<?php echo $search_query; ?>">Last</a>
                             </li>
                         <?php endif; ?>
                     </ul>
@@ -147,4 +156,5 @@ $total_pages = ceil($total_results / $limit);
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

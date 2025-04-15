@@ -12,26 +12,20 @@ $totalProducts = $productResult ? mysqli_fetch_assoc($productResult)['total_prod
 $adminResult = mysqli_query($dbconn, $adminQuery);
 $totaladmin = $adminResult ? mysqli_fetch_assoc($adminResult)['total_admin'] : 0;
 
-// // Fetch total orders
-// $orderQuery = "SELECT COUNT(*) AS total_orders FROM orders";
-// $orderResult = mysqli_query($dbconn, $orderQuery);
-// $totalOrders = $orderResult ? mysqli_fetch_assoc($orderResult)['total_orders'] : 0;
+// Fetch total pending orders
+$pendingOrderQuery = "SELECT COUNT(*) AS total_pending_orders FROM orders WHERE order_status = 'Pending'";
+$pendingOrderResult = mysqli_query($dbconn, $pendingOrderQuery);
+$totalPendingOrders = $pendingOrderResult ? mysqli_fetch_assoc($pendingOrderResult)['total_pending_orders'] : 0; // Fix: Changed $orderResult to $pendingOrderResult
 
-// // Fetch total revenue
-// $revenueQuery = "SELECT SUM(total_price) AS total_revenue FROM orders WHERE order_status = 'Completed'";
-// $revenueResult = mysqli_query($dbconn, $revenueQuery);
-// $totalRevenue = $revenueResult ? mysqli_fetch_assoc($revenueResult)['total_revenue'] : 0;
-// $totalRevenue = $totalRevenue ? $totalRevenue : 0;
+// Fetch total completed orders
+$completedOrderQuery = "SELECT COUNT(*) AS total_completed_orders FROM orders WHERE order_status = 'Completed'";
+$completedOrderResult = mysqli_query($dbconn, $completedOrderQuery);
+$totalCompletedOrders = $completedOrderResult ? mysqli_fetch_assoc($completedOrderResult)['total_completed_orders'] : 0;
 
-// // Fetch recent orders (limit to 5)
-// $recentOrdersQuery = "SELECT order_id, customer_name, total_price, order_status, created_at FROM orders ORDER BY created_at DESC LIMIT 5";
-// $recentOrdersResult = mysqli_query($dbconn, $recentOrdersQuery);
-// $recentOrders = [];
-// if ($recentOrdersResult) {
-//     while ($row = mysqli_fetch_assoc($recentOrdersResult)) {
-//         $recentOrders[] = $row;
-//     }
-// }
+// Fetch total revenue (sum of total_amount column in orders)
+$revenueQuery = "SELECT SUM(total_amount) AS total_revenue FROM orders WHERE payment_status = 'Completed'";
+$revenueResult = mysqli_query($dbconn, $revenueQuery);
+$totalRevenue = $revenueResult ? mysqli_fetch_assoc($revenueResult)['total_revenue'] : 0;
 
 // Construct response
 $response["status"] = "success";
@@ -39,9 +33,9 @@ $response["message"] = "Dashboard data retrieved successfully";
 $response["data"] = [
     "total_products" => $totalProducts,
     "total_admin" => $totaladmin,
-    // "total_orders" => $totalOrders,
-    // "total_revenue" => $totalRevenue,
-    // "recent_orders" => $recentOrders
+    "total_pending_orders" => $totalPendingOrders,
+    "total_completed_orders" => $totalCompletedOrders,
+    "total_revenue" => $totalRevenue,
 ];
 
 // Close database connection

@@ -38,9 +38,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['product_id'], $_POST['
             'price' => $product['price'],
             'quantity' => $quantity,
             'stock' => $product['quantity'],
-            'image' => $product['image']
+            'image' => $product['image'],
+            'id' => $product_id
         ];
-        
+
     }
 
     header('Location: cart.php');

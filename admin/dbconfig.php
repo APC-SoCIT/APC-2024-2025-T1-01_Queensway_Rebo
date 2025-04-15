@@ -3,7 +3,7 @@ class Database
 {
 
     private $host = "localhost";
-    private $db_name = "grayenterprise";
+    private $db_name = "hardware";
     private $username = "root";
     private $password = "";
     public $conn;

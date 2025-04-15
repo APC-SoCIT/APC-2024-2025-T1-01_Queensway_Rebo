@@ -1,5 +1,4 @@
 <?php
-
 require_once 'dbconfig.php';
 
 class USER
@@ -12,7 +11,7 @@ class USER
 		$database = new Database();
 		$db = $database->dbConnection();
 		$this->conn = $db;
-    }
+	}
 
 	public function runQuery($sql)
 	{
@@ -26,74 +25,67 @@ class USER
 		return $stmt;
 	}
 
-	public function register($uname,$email,$upass,$code)
+	public function register($uname, $email, $upass, $code)
 	{
-		try
-		{
-			$password = md5($upass);
-			$stmt = $this->conn->prepare("INSERT INTO admin(userName,userEmail,userPass,tokenCode)
-			                                             VALUES(:user_name, :user_mail, :user_pass, :active_code)");
+		try {
+			// Use bcrypt to hash the password
+			$password = password_hash($upass, PASSWORD_BCRYPT);  // More secure than MD5
 
-      $stmt->bindparam(":user_name",$uname);
-			$stmt->bindparam(":user_mail",$email);
-			$stmt->bindparam(":user_pass",$password);
-			$stmt->bindparam(":active_code",$code);
+			$stmt = $this->conn->prepare("INSERT INTO admin(userName, userEmail, userPass, tokenCode)
+										  VALUES(:user_name, :user_mail, :user_pass, :active_code)");
+
+			$stmt->bindparam(":user_name", $uname);
+			$stmt->bindparam(":user_mail", $email);
+			$stmt->bindparam(":user_pass", $password);
+			$stmt->bindparam(":active_code", $code);
 			$stmt->execute();
 			return $stmt;
-		}
-		catch(PDOException $ex)
-		{
+		} catch (PDOException $ex) {
 			echo $ex->getMessage();
 		}
 	}
 
 
-	public function login($email,$upass)
+	public function login($email, $upass)
 	{
-		try
-		{
+		try {
+			// Prepare the query
 			$stmt = $this->conn->prepare("SELECT * FROM admin WHERE userEmail=:email_id");
-			$stmt->execute(array(":email_id"=>$email));
-			$userRow=$stmt->fetch(PDO::FETCH_ASSOC);
 
-			if($stmt->rowCount() == 1)
-			{
-				if($userRow['userStatus']=="Y")
-				{
-					if($userRow['userPass']==md5($upass))
-					{
-						$_SESSION['userSession'] = $userRow['userID'];
-						return true;
-					}
-					else
-					{
-						header("Location: index.php?error");
-						exit;
-					}
-				}
-				else
-				{
-					header("Location: index.php?inactive");
+			// Execute the query
+			$stmt->execute(array(":email_id" => $email));
+
+			// Fetch the user data
+			$userRow = $stmt->fetch(PDO::FETCH_ASSOC);
+
+			if ($stmt->rowCount() == 1) {
+				// Verify the entered password
+				if (password_verify($upass, $userRow['userPass'])) {
+					echo "Password is correct!<br>";
+
+					// Store session and return true
+					$_SESSION['userSession'] = $userRow['userID'];
+					return true;
+				} else {
+					echo "Password is incorrect!<br>";
+					header("Location: index.php?error");
 					exit;
 				}
-			}
-			else
-			{
+			} else {
+				echo "No matching user found with the given email.<br>";
 				header("Location: index.php?error");
 				exit;
 			}
-		}
-		catch(PDOException $ex)
-		{
+		} catch (PDOException $ex) {
 			echo $ex->getMessage();
 		}
 	}
+
 
 
 	public function is_logged_in()
 	{
-		if(isset($_SESSION['userSession']))
-		{
+		if (isset($_SESSION['userSession'])) {
 			return true;
 		}
 	}
@@ -109,23 +101,24 @@ class USER
 		$_SESSION['userSession'] = false;
 	}
 
-	function send_mail($email,$message,$subject)
+	public function send_mail($email, $message, $subject)
 	{
 		require_once('mailer/class.phpmailer.php');
-		$mail = new PHPMailer();
+		$mail = new PHPMailer(true);
 		$mail->IsSMTP();
-		$mail->SMTPDebug  = 0;
-		$mail->SMTPAuth   = true;
-		$mail->SMTPSecure = "ssl";
-		$mail->Host       = "smtp.gmail.com";
-		$mail->Port       = 465;
+		$mail->SMTPDebug = 0;
+		$mail->SMTPAuth = true;
+		$mail->SMTPSecure = 'tls';
+		$mail->Host = "smtp.gmail.com";
+		$mail->Port = 587;
 		$mail->AddAddress($email);
-		$mail->Username="grayenterprisethesis@gmail.com";
-		$mail->Password="thesisyay";
-		$mail->SetFrom('grayenterprisethesis@gmail.com','Gray Enterprise');
-		$mail->AddReplyTo("grayenterprisethesis@gmail.com","Gray Enterprise");
-		$mail->Subject    = $subject;
+		$mail->Username = "";
+		$mail->Password = "";  // Please use app password for production
+		$mail->SetFrom('', '');
+		$mail->AddReplyTo("", "");
+		$mail->Subject = $subject;
 		$mail->MsgHTML($message);
 		$mail->Send();
 	}
 }
+?>
