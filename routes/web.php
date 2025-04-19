@@ -10,6 +10,7 @@ use Illuminate\Auth\Events\Verified;
 use App\Models\User;
 use App\Models\Admin;
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Website\WebsiteCartController;
 
 
 // Home Page Route (Publicly accessible)
@@ -143,4 +144,13 @@ Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(functi
 });
 
 Route::get('product/{id}', [WebsiteProductController::class, 'show'])->name('product.show');
+
+
+// Cart routes
+Route::prefix('cart')->namespace('Website')->group(function () {
+    Route::get('/', [WebsiteCartController::class, 'index'])->name('cart.index');
+    Route::post('/add', [WebsiteCartController::class, 'add'])->name('cart.add'); // Add product to cart
+    Route::post('/update', [WebsiteCartController::class, 'update'])->name('cart.update');
+    Route::post('/remove', [WebsiteCartController::class, 'remove'])->name('cart.remove');
+});
 

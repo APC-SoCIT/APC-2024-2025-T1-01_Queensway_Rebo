@@ -18,7 +18,7 @@
             <p><strong>Stock:</strong> {{ $product->quantity }}</p>
 
             <!-- Add to Cart Form -->
-            <form action="" method="POST">
+            <form action="{{ route('cart.add') }}" method="POST">
                 @csrf
                 <div class="mb-3">
                     <label for="quantity" class="form-label">Quantity</label>
