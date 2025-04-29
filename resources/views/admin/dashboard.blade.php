@@ -17,7 +17,7 @@
             <div class="card text-white bg-success">
                 <div class="card-body">
                     <h5 class="card-title">Total Revenue</h5>
-                    <p class="card-text">${{ $totalRevenue }}</p>
+                    <p class="card-text">₱{{ $totalRevenue }}</p>
                 </div>
             </div>
         </div>
