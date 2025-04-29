@@ -4,7 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Product extends Model {
+class Product extends Model
+{
     protected $fillable = ['name', 'price', 'image', 'description', 'quantity', 'date_created'];
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
 }
 
