@@ -1,113 +1,92 @@
 <?php
-
 namespace App\Http\Controllers\Website;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\Controller;
+use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Product;
+use App\Mail\OrderInvoiceMail;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
+use App\Models\User;
 
-class WebsiteCartController extends Controller
+class WebsiteCheckoutController extends Controller
 {
-    // Display the shopping cart
-// WebsiteCartController.php
-
-    public function index()
+    public function show()
     {
         $cartItems = session('cart', []);
-        $total = 0;
+        $total = array_sum(array_map(fn($item) => $item['price'] * $item['quantity'], $cartItems));
 
-        foreach ($cartItems as $item) {
-            $total += $item['price'] * $item['quantity'];
-        }
-
-        return view('website.cart', compact('cartItems', 'total'));
+        return view('website.checkout', [
+            'cartItems' => $cartItems,
+            'total' => $total,
+            'paypalClientId' => config('paypal.client_id'),
+        ]);
     }
 
-    // Add a product to the cart
-    public function add(Request $request)
+
+    public function complete(Request $request)
     {
-        $productId = $request->input('product_id');
-        $quantity = $request->input('quantity');
-
-        // Fetch the product from the database
-        $product = Product::find($productId);
-
-        if ($product) {
-            // Get the current cart from the session
-            $cart = session('cart', []);
-
-            // Check if the product already exists in the cart
-            if (isset($cart[$productId])) {
-                // Update quantity if the product is already in the cart
-                $cart[$productId]['quantity'] += $quantity;
-            } else {
-                // Add new product to the cart
-                $cart[$productId] = [
-                    'id' => $product->id,        // Add the product ID here
-                    'name' => $product->name,
-                    'price' => $product->price,
-                    'quantity' => $quantity,
-                    'image' => $product->image,
-                ];
+        $data = $request->all();
+        $uniqueOrderNumber = strtoupper(uniqid());
+    
+        if (!isset($data['items']) || !is_array($data['items']) || !isset($data['totalAmount']) || !isset($data['orderID'])) {
+            return response()->json(['success' => false, 'message' => 'Invalid payload'], 400);
+        }
+    
+        try {
+            $order = Order::create([
+                'user_id' => auth()->id(),
+                'total_amount' => $data['totalAmount'],
+                'order_status' => 'paid',
+                'payment_status' => 'completed',
+                'paypal_order_id' => $data['orderID'],
+            ]);
+    
+            foreach ($data['items'] as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['id'],
+                    'product_name' => $item['name'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['price'],
+                ]);
+    
+                $product = Product::find($item['id']);
+                if ($product && $product->quantity >= $item['quantity']) {
+                    $product->quantity -= $item['quantity'];
+                    $product->save();
+                }
             }
-
-            // Store the updated cart in the session
-            session(['cart' => $cart]);
-
-            return redirect()->route('cart.index')->with('success', 'Product added to cart!');
+    
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
-
-        return redirect()->route('product.show', $productId)->with('error', 'Product not found!');
     }
+    
 
-
-    // Update the quantity of a cart item
-    public function update(Request $request)
+    public function paymentSuccess(Request $request)
     {
-        $cart = session('cart', []);
-        $productId = $request->input('product_id');
-        $quantity = $request->input('quantity');
+        $orderId = $request->query('order_id');
+        $order = Order::with('items')->where('paypal_order_id', $orderId)->firstOrFail();
+    
+        // Optional: Clear cart
+        session()->forget('cart');
+    
+        $user = $order->user;
 
-        // Update the quantity of the item in the cart
-        if (isset($cart[$productId])) {
-            $cart[$productId]['quantity'] = $quantity;
-            session(['cart' => $cart]);
-
-            $subtotal = $cart[$productId]['price'] * $quantity;
-            $total = array_sum(array_map(function ($item) {
-                return $item['price'] * $item['quantity'];
-            }, $cart));
-
-            return response()->json([
-                'success' => true,
-                'subtotal' => $subtotal,
-                'total' => $total,
-            ]);
+    
+        // ✅ Generate and send PDF invoice
+        if ($user) {
+            $pdf = Pdf::loadView('pdf.invoice', compact('order'));
+            Mail::to($user->email)->send(new OrderInvoiceMail($order, $pdf));
         }
-
-        return response()->json(['success' => false]);
+    
+        // Return the success view
+        return view('website.payment-success', compact('order'));
     }
 
-    // Remove an item from the cart
-    public function remove(Request $request)
-    {
-        $cart = session('cart', []);
-        $productId = $request->input('product_id');
-
-        if (isset($cart[$productId])) {
-            unset($cart[$productId]);
-            session(['cart' => $cart]);
-
-            $total = array_sum(array_map(function ($item) {
-                return $item['price'] * $item['quantity'];
-            }, $cart));
-
-            return response()->json([
-                'success' => true,
-                'total' => $total,
-            ]);
-        }
-
-        return response()->json(['success' => false]);
-    }
 }
