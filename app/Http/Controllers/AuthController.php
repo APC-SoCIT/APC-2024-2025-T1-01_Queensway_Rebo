@@ -21,28 +21,34 @@ class AuthController extends Controller
 // Handle user login
 public function login(Request $request)
 {
+    // Validate the credentials
     $credentials = $request->validate([
-        'email' => ['required', 'email'],
-        'password' => ['required'],
+        'email' => 'required|email',
+        'password' => 'required',
     ]);
 
+    // Attempt to log the user in
     if (Auth::attempt($credentials)) {
         $user = Auth::user();
 
+        // Check if the user's email is verified
         if (!$user->hasVerifiedEmail()) {
-            Auth::logout(); // log out unverified
-            return back()->withInput($request->only('email'))
-                ->with('showResend', true)
-                ->withErrors(['email' => 'You must verify your email address.']);
+            // Log out the user immediately if email is not verified
+            Auth::logout();
+
+            // Redirect back with an error message
+            return back()->withErrors(['email' => 'Please verify your email address before logging in.']);
         }
 
+        // Regenerate the session to prevent session fixation
         $request->session()->regenerate();
-        return redirect()->intended('/user/dashboard');
+
+        // Redirect to the intended dashboard (default user dashboard here)
+        return redirect()->intended('user/dashboard');
     }
 
-    return back()->withErrors([
-        'email' => 'Invalid credentials.',
-    ])->withInput($request->only('email'));
+    // If login fails, return back with error
+    return back()->withErrors(['email' => 'Invalid credentials']);
 }
 
     
@@ -64,7 +70,7 @@ public function login(Request $request)
         
         event(new Registered($user));
         
-        return redirect()->route('login')->with('message', 'Registration successful. Please check your email to verify your account before logging in.');
+        return redirect()->route('verification.notice');
         
     }
 

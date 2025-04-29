@@ -13,7 +13,7 @@ class AdminController extends Controller
     {
         // Fetch the data for the dashboard
         $totalUsers = User::count();
-        $totalRevenue = Order::where('order_status', 'paid')->sum('total_amount');
+        $totalRevenue = Order::where('order_status', 'completed')->sum('total_amount');
         $pendingOrders = Order::where('order_status', 'pending')->count();
         $totalProducts = Product::count();
 
