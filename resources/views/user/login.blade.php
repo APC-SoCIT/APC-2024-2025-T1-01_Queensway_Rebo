@@ -16,16 +16,36 @@
                             </div>
                         @endif
 
-                        <!-- Display validation errors -->
-                        @if ($errors->any())
+                        {{-- Validation Errors --}}
+                        @if($errors->any())
                             <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
+                                <div class="mb-0">
+                                    @foreach($errors->all() as $error)
+                                        <div>{{ $error }}</div>
                                     @endforeach
-                                </ul>
+
+                                    <!-- Resend Verification Form -->
+                                    @if (session('showResend'))
+                                        <div class="mt-3">
+                                            <form method="POST" action="{{ route('verification.send') }}"
+                                                onsubmit="showResendSpinner(this)">
+                                                @csrf
+                                                <input type="hidden" name="email" value="{{ old('email') }}">
+
+                                                <button type="submit" class="btn btn-link p-0" id="resend-btn">
+                                                    <span class="spinner-border spinner-border-sm d-none" role="status"
+                                                        aria-hidden="true" id="resend-spinner"></span>
+                                                    <span id="resend-text">Resend Verification Email</span>
+                                                </button>
+                                            </form>
+
+                                        </div>
+                                    @endif
+
+                                </div>
                             </div>
                         @endif
+
 
                         <form method="POST" action="{{ route('login.submit') }}">
                             @csrf

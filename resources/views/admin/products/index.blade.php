@@ -28,7 +28,7 @@
                     @foreach($products as $product)
                         <tr>
                             <td>{{ $product->name }}</td>
-                            <td>${{ number_format($product->price, 2) }}</td>
+                            <td>₱{{ number_format($product->price, 2) }}</td>
                             <td>{{ $product->quantity }}</td>
                             <td>
                                 <a href="{{ route('admin.products.edit', $product) }}" class="btn btn-warning btn-sm">
@@ -54,8 +54,27 @@
             <div>
                 Showing {{ $products->firstItem() }} to {{ $products->lastItem() }} of {{ $products->total() }} products
             </div>
-            <div>
-                {{ $products->links() }} <!-- Pagination links -->
+            <!-- Custom Pagination -->
+            <div class="pagination-container text-center mt-4">
+                <ul class="pagination">
+                    @if ($products->onFirstPage())
+                        <li class="page-item disabled"><span class="page-link">« Previous</span></li>
+                    @else
+                        <li class="page-item"><a href="{{ $products->previousPageUrl() }}" class="page-link">« Previous</a></li>
+                    @endif
+
+                    @for ($i = 1; $i <= $products->lastPage(); $i++)
+                        <li class="page-item {{ $i == $products->currentPage() ? 'active' : '' }}">
+                            <a href="{{ $products->url($i) }}" class="page-link">{{ $i }}</a>
+                        </li>
+                    @endfor
+
+                    @if ($products->hasMorePages())
+                        <li class="page-item"><a href="{{ $products->nextPageUrl() }}" class="page-link">Next »</a></li>
+                    @else
+                        <li class="page-item disabled"><span class="page-link">Next »</span></li>
+                    @endif
+                </ul>
             </div>
         </div>
     </div>
