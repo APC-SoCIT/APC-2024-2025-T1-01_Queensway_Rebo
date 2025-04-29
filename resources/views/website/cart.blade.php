@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.website')
 
 @section('content')
 <div class="container my-5">
@@ -47,12 +47,13 @@
             </table>
         </div>
         <div class="d-flex justify-content-between">
-            <a href="" class="btn btn-outline-secondary">Continue Shopping</a>
-            <a href="" class="btn btn-primary">Proceed to Checkout</a>
+            <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">Continue Shopping</a>
+            <a href="{{ route('checkout') }}" class="btn btn-primary">Proceed to Checkout</a>
+
         </div>
     @else
         <p class="text-muted">Your cart is empty.</p>
-        <a href="" class="btn btn-primary">Start Shopping</a>
+        <a href="{{ route('products.index') }}" class="btn btn-primary">Start Shopping</a>
     @endif
 </div>
 @endsection

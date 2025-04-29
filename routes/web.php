@@ -1,156 +1,133 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Website\WebsiteProductController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\ProductController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Website\WebsiteCartController;
+use App\Http\Controllers\Website\WebsiteCheckoutController;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Verified;
 use App\Models\User;
 use App\Models\Admin;
-use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Website\WebsiteCartController;
+use App\Http\Controllers\OrderController;
 
+// Public Routes
+Route::get('/', [WebsiteProductController::class, 'landingPage']);
 
-// Home Page Route (Publicly accessible)
-Route::get('/', function () {
-    return view('welcome'); // Public homepage view
-})->name('home');
+// Product Pages
+Route::get('product/{id}', [WebsiteProductController::class, 'show'])->name('product.show');
+Route::get('/shop', [WebsiteProductController::class, 'products'])->name('products.index');
 
-// Products List (Publicly accessible)
-Route::get('/products', [ProductController::class, 'getProducts'])->name('products');
+// User Authentication & Dashboard Routes
+Route::prefix('user')->group(function () {
+    Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [AuthController::class, 'login'])->name('login.submit');
+    Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
+    Route::post('register', [AuthController::class, 'register'])->name('register.submit');
+});
+Route::prefix('user')->middleware(['auth', 'verified'])->group(function () {
+    Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('user.dashboard');
+});
 
-// Show verify email notice
-Route::get('/email/verify', function () {
-    return view('auth.verify-email');
-})->middleware('auth')->name('verification.notice');
+// Admin Authentication Routes
+Route::prefix('admin')->group(function () {
+    Route::get('login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
+    Route::post('login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
+    Route::get('register', [AdminAuthController::class, 'showRegistrationForm'])->name('admin.register');
+    Route::post('register', [AdminAuthController::class, 'register'])->name('admin.register.submit');
+});
+// Admin Dashboard (only accessible for logged-in admins)
+Route::prefix('admin')->namespace('Admin')->middleware('auth:admin')->group(function () {
+    Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
+    Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    // Product Management Routes
+    Route::prefix('products')->name('admin.products.')->group(function () {
+        Route::get('/', [ProductController::class, 'index'])->name('index');
+        Route::get('create', [ProductController::class, 'create'])->name('create');
+        Route::post('/', [ProductController::class, 'store'])->name('store');
+        Route::get('{product}/edit', [ProductController::class, 'edit'])->name('edit');
+        Route::put('{product}', [ProductController::class, 'update'])->name('update');
+        Route::delete('{product}', [ProductController::class, 'destroy'])->name('destroy');
+    });
+});
 
-// Actual verification link
+// Email Verification Routes
+Route::post('/email/verification-notification', function (Request $request) {
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user) {
+        return back()->with('message', 'User not found.');
+    }
+
+    if ($user->hasVerifiedEmail()) {
+        return back()->with('message', 'Email already verified.');
+    }
+
+    $user->sendEmailVerificationNotification();
+
+    return back()->with('message', 'Verification link sent!');
+})->middleware('throttle:6,1')->name('verification.send');
+
 Route::get('/email/verify/{id}/{hash}', function ($id, $hash, Request $request) {
     $user = User::findOrFail($id);
-
-    if (!URL::hasValidSignature($request)) {
+    if (!URL::hasValidSignature($request))
         abort(403, 'Invalid or expired verification link.');
-    }
-
-    if (!hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
+    if (!hash_equals((string) $hash, sha1($user->getEmailForVerification())))
         abort(403, 'Invalid email hash.');
-    }
-
     if (!$user->hasVerifiedEmail()) {
         $user->markEmailAsVerified();
         event(new Verified($user));
     }
-    return redirect('/login')->with('message', 'Email verified successfully!');
-
+    return redirect('/user/login')->with('message', 'Email verified successfully!');
 })->middleware('signed')->name('verification.verify');
 
-
-// Resend link
-Route::post('/email/verification-notification', function (Request $request) {
-    $request->user()->sendEmailVerificationNotification();
-    return back()->with('message', 'Verification link sent!');
-})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
-
-// Admin email verification route
-Route::get('/admin/email/verify', function () {
-    return view('admin.verify-email');
-})->middleware('auth:admin')->name('admin.verification.notice');
-
-// Admin email verification link
+// Admin Email Verification Routes
 Route::get('/admin/email/verify/{id}/{hash}', function ($id, $hash, Request $request) {
     $admin = Admin::findOrFail($id);
-
-    if (!URL::hasValidSignature($request)) {
+    if (!URL::hasValidSignature($request))
         abort(403, 'Invalid or expired verification link.');
-    }
-
-    if (!hash_equals((string) $hash, sha1($admin->getEmailForVerification()))) {
+    if (!hash_equals((string) $hash, sha1($admin->getEmailForVerification())))
         abort(403, 'Invalid email hash.');
-    }
-
     if (!$admin->hasVerifiedEmail()) {
         $admin->markEmailAsVerified();
         event(new Verified($admin));
     }
-
     return redirect('/admin/login')->with('message', 'Email verified successfully!');
 })->middleware('signed')->name('admin.verification.verify');
-
 Route::post('/admin/email/verification-notification', function (Request $request) {
-    $request->validate(['email' => 'required|email']);
-
     $admin = Admin::where('email', $request->email)->first();
-
-    if (!$admin) {
+    if (!$admin)
         return back()->with('message', 'No admin found with that email.');
-    }
-
-    if ($admin->hasVerifiedEmail()) {
+    if ($admin->hasVerifiedEmail())
         return back()->with('message', 'Email already verified.');
-    }
-
     $admin->sendEmailVerificationNotification();
-
     return back()->with('message', 'Verification link sent!');
 })->middleware('throttle:6,1')->name('admin.verification.send');
 
 
-
-// User Routes
-Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('login', [AuthController::class, 'login'])->name('login.submit');
-Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-
-// User Registration
-Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
-Route::post('register', [AuthController::class, 'register'])->name('register.submit');
-
-// User Dashboard (only accessible for logged-in users)
-Route::middleware(['auth', 'verified'])->get('user/dashboard', function () {
-    return view('user.dashboard');
-})->name('user.dashboard');
-
-// Admin Routes
-Route::get('admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
-Route::post('admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
-Route::post('admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
-
-Route::get('admin/register', [AdminAuthController::class, 'showRegistrationForm'])->name('admin.register');
-Route::post('admin/register', [AdminAuthController::class, 'register'])->name('admin.register.submit');
-
-// Admin Dashboard (only accessible for logged-in admins)
-Route::middleware(['auth:admin'])->get('admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-
-Route::middleware(['auth:admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Show all products
-    Route::get('products', [ProductController::class, 'index'])->name('products.index');
-    
-    // Show form to create a new product
-    Route::get('products/create', [ProductController::class, 'create'])->name('products.create');
-    
-    // Store a new product
-    Route::post('products', [ProductController::class, 'store'])->name('products.store');
-    
-    // Show form to edit a product
-    Route::get('products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
-    
-    // Update a product
-    Route::put('products/{product}', [ProductController::class, 'update'])->name('products.update');
-    
-    // Delete a product
-    Route::delete('products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
-});
-
-Route::get('product/{id}', [WebsiteProductController::class, 'show'])->name('product.show');
-
-
-// Cart routes
+// Cart Routes
 Route::prefix('cart')->namespace('Website')->group(function () {
     Route::get('/', [WebsiteCartController::class, 'index'])->name('cart.index');
-    Route::post('/add', [WebsiteCartController::class, 'add'])->name('cart.add'); // Add product to cart
+    Route::post('/add', [WebsiteCartController::class, 'add'])->name('cart.add');
     Route::post('/update', [WebsiteCartController::class, 'update'])->name('cart.update');
     Route::post('/remove', [WebsiteCartController::class, 'remove'])->name('cart.remove');
 });
 
+// Checkout Routes
+Route::get('/checkout', [WebsiteCheckoutController::class, 'show'])->name('checkout');
+Route::post('/checkout/complete', [WebsiteCheckoutController::class, 'complete'])->name('checkout.complete');
+
+// Payment Success Route
+Route::get('/payment-success', [WebsiteCheckoutController::class, 'paymentSuccess']);
+
+
+Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+
+Route::get('/dashboard', [DashboardController::class, 'dashboard'])
+    ->name('user.dashboard')
+    ->middleware(['auth', 'verified']);
