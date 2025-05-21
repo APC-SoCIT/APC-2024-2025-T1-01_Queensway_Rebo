@@ -42,70 +42,82 @@
 @endsection
 
 @section('scripts')
-    {{-- 1) PayPal SDK --}}
     <script src="https://www.paypal.com/sdk/js?client-id={{ $paypalClientId }}&currency=PHP"></script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Grab the raw cart object (keys are product IDs)
-        const rawCart = @json($cartItems);
-        // Format total as a string with two decimals
-        const totalAmount = "{{ number_format($total, 2, '.', '') }}";
+        document.addEventListener('DOMContentLoaded', function () {
+            const rawCart = @json($cartItems);
+            const totalAmount = "{{ number_format($total, 2, '.', '') }}";
 
-        // Rebuild items[] so each object *always* has an `id` field
-        const items = Object.entries(rawCart).map(([id, item]) => ({
-            id:       id,
-            name:     item.name,
-            price:    item.price.toString(),
-            quantity: item.quantity,
-            image:    item.image || ''   // optional
-        }));
+            const items = Object.entries(rawCart).map(([id, item]) => ({
+                id: id,
+                name: item.name,
+                price: item.price.toString(),
+                quantity: item.quantity,
+                image: item.image || ''
+            }));
 
-        // Render the PayPal button
-        paypal.Buttons({
-            createOrder: function (data, actions) {
-                return actions.order.create({
-                    purchase_units: [{
-                        amount: { value: totalAmount }
-                    }]
-                });
-            },
-            onApprove: function (data, actions) {
-                return actions.order.capture().then(function () {
-                    // Now post exactly what your Laravel controller expects:
-                    const payload = {
-                        orderID:     data.orderID,   // <-- use `data.orderID`, not details.id
-                        totalAmount: totalAmount,
-                        items:       items
-                    };
-
-                    return fetch("{{ route('checkout.complete') }}", {
-                        method:  "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN":  "{{ csrf_token() }}"
-                        },
-                        body: JSON.stringify(payload)
-                    })
-                    .then(res => res.json())
-                    .then(json => {
-                        if (json.success) {
-                            window.location.href = "{{ url('/payment-success') }}?order_id=" + data.orderID;
-                        } else {
-                            alert("Checkout failed: " + (json.message || "Unknown error"));
+            paypal.Buttons({
+                createOrder: function (data, actions) {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: { value: totalAmount }
+                        }],
+                        application_context: {
+                            shipping_preference: "GET_FROM_FILE" // allow user to input address
                         }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        alert("An error occurred during checkout.");
                     });
-                });
-            },
-            onError: function (err) {
-                console.error("PayPal error:", err);
-                alert("Payment failed. Please try again.");
-            }
-        }).render('#paypal-button-container');
-    });
+                },
+
+                onApprove: function (data, actions) {
+                    return actions.order.capture().then(function (details) {
+                        const shippingInfo = details.purchase_units[0].shipping;
+                        const name = shippingInfo?.name?.full_name || '';
+                        const address = shippingInfo?.address || {};
+
+                        const payload = {
+                            orderID: data.orderID,
+                            totalAmount: totalAmount,
+                            items: items,
+                            shipping: {
+                                name: name,
+                                address_line_1: address.address_line_1 || '',
+                                address_line_2: address.address_line_2 || '',
+                                city: address.admin_area_2 || '',
+                                state: address.admin_area_1 || '',
+                                postal_code: address.postal_code || '',
+                                country: address.country_code || ''
+                            }
+                        };
+
+                        return fetch("{{ route('checkout.complete') }}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}"
+                            },
+                            body: JSON.stringify(payload)
+                        })
+                            .then(res => res.json())
+                            .then(json => {
+                                if (json.success) {
+                                    window.location.href = "{{ url('/payment-success') }}?order_id=" + data.orderID;
+                                } else {
+                                    alert("Checkout failed: " + (json.message || "Unknown error"));
+                                }
+                            })
+                            .catch(err => {
+                                console.error(err);
+                                alert("An error occurred during checkout.");
+                            });
+                    });
+                },
+
+                onError: function (err) {
+                    console.error("PayPal error:", err);
+                    alert("Payment failed. Please try again.");
+                }
+            }).render('#paypal-button-container');
+        });
     </script>
 @endsection

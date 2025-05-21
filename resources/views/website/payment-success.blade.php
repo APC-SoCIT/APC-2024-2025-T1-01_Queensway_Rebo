@@ -3,7 +3,7 @@
 @section('content')
     <div class="container my-5">
         <h1 class="text-success">Payment Successful!</h1>
-        <p>Thank you for your purchase. Your order ID is <strong>{{ $order->id }}</strong>.</p>
+        <p>Thank you for your purchase. Your order # is <strong>{{ $order->order_number }}</strong>.</p>
 
         <h4 class="mt-4">Order Summary</h4>
         <table class="table">

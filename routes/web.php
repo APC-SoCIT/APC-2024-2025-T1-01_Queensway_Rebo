@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\AdminAuthController;
+use App\Http\Controllers\Website\WebsiteFaqBotController;
 use App\Http\Controllers\Website\WebsiteProductController;
 use App\Http\Controllers\Admin\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +15,9 @@ use Illuminate\Auth\Events\Verified;
 use App\Models\User;
 use App\Models\Admin;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\User\ForgotPasswordController;
+use App\Http\Controllers\User\ResetPasswordController;
 
 // Public Routes
 Route::get('/', [WebsiteProductController::class, 'landingPage']);
@@ -42,10 +46,11 @@ Route::prefix('admin')->group(function () {
     Route::post('register', [AdminAuthController::class, 'register'])->name('admin.register.submit');
 });
 // Admin Dashboard (only accessible for logged-in admins)
-Route::prefix('admin')->namespace('Admin')->middleware('auth:admin')->group(function () {
+Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
     Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    // Product Management Routes
+
+    // Product Management
     Route::prefix('products')->name('admin.products.')->group(function () {
         Route::get('/', [ProductController::class, 'index'])->name('index');
         Route::get('create', [ProductController::class, 'create'])->name('create');
@@ -54,7 +59,13 @@ Route::prefix('admin')->namespace('Admin')->middleware('auth:admin')->group(func
         Route::put('{product}', [ProductController::class, 'update'])->name('update');
         Route::delete('{product}', [ProductController::class, 'destroy'])->name('destroy');
     });
+
+    // Order Management
+    Route::get('orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+    Route::post('orders/{order}/mark-shipped', [AdminOrderController::class, 'markShipped'])->name('admin.orders.markShipped');
+    Route::post('orders/{order}/mark-preparing', [AdminOrderController::class, 'markedPreparing'])->name('admin.orders.markPreparing');
 });
+
 
 // Email Verification Routes
 Route::post('/email/verification-notification', function (Request $request) {
@@ -99,6 +110,7 @@ Route::get('/admin/email/verify/{id}/{hash}', function ($id, $hash, Request $req
     }
     return redirect('/admin/login')->with('message', 'Email verified successfully!');
 })->middleware('signed')->name('admin.verification.verify');
+
 Route::post('/admin/email/verification-notification', function (Request $request) {
     $admin = Admin::where('email', $request->email)->first();
     if (!$admin)
@@ -128,6 +140,24 @@ Route::get('/payment-success', [WebsiteCheckoutController::class, 'paymentSucces
 
 Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
 
-Route::get('/dashboard', [DashboardController::class, 'dashboard'])
-    ->name('user.dashboard')
-    ->middleware(['auth', 'verified']);
+Route::get('/faq-bot', function () {
+    return view('website.faq-chat');
+})->name('faq.bot.view');
+
+Route::post('/faq-bot', [WebsiteFaqBotController::class, 'handle'])->name('faq.bot');
+
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+
+
+// Route::get('/dashboard', [DashboardController::class, 'dashboard'])
+//     ->name('user.dashboard')
+//     ->middleware(['auth', 'verified']);
+
+// Route::middleware(['auth', 'admin'])->group(function () {
+//     Route::get('/admin/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+//     Route::post('/admin/orders/{order}/mark-shipped', [AdminOrderController::class, 'markShipped'])->name('admin.orders.markShipped');
+// });
+

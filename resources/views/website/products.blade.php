@@ -1,132 +1,177 @@
 @extends('layouts.website')
 
 @section('content')
-    <style>
-        .product-card img {
-            width: 100%;
-            height: 200px;
-            /* Adjust height to maintain uniformity */
-            object-fit: cover;
-        }
+<style>
+    .product-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
 
-        .product-card {
-            transition: transform 0.2s;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            /* Slight rounding for the cards */
-        }
+    .product-card {
+        transition: all 0.3s ease-in-out;
+        padding: 15px;
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        background-color: #fff;
+    }
 
-        .product-card:hover {
-            transform: scale(1.05);
-        }
+    .product-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
 
-        .sort-select {
-            max-width: 200px;
-        }
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
 
-        /* Adjust the grid layout */
-        .row-cols-md-3 .col {
-            flex: 1 0 33%;
-            /* Make each card occupy a third of the row */
-            max-width: 33%;
-            margin-bottom: 20px;
-        }
+    .card-text {
+        font-size: 0.9rem;
+        color: #666;
+    }
 
-        /* Adjust text and button styling inside card */
-        .card-body {
-            padding: 15px;
-        }
+    .btn-primary {
+        font-size: 0.85rem;
+        padding: 6px 14px;
+        border-radius: 20px;
+    }
 
-        .card-title {
-            font-size: 1.1rem;
-            /* Slightly larger title */
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
+    .category-filter input[type="radio"] {
+        display: none;
+    }
 
-        .card-text {
-            font-size: 0.9rem;
-            /* Slightly bigger text for better readability */
-            color: #555;
-        }
+    .category-filter label {
+        display: block;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-bottom: 8px;
+        transition: all 0.2s;
+    }
 
-        .btn-primary {
-            font-size: 0.9rem;
-            padding: 8px 16px;
-        }
+    .category-filter input[type="radio"]:checked + label {
+        background-color: #007bff;
+        color: white;
+        border-color: #007bff;
+    }
 
-        @media (max-width: 768px) {
-            .row-cols-md-3 .col {
-                flex: 1 0 50%;
-                /* Cards take up 50% of the width on medium screens */
-                max-width: 50%;
-            }
-        }
+    .sort-select {
+        max-width: 200px;
+        font-size: 0.9rem;
+    }
+</style>
 
-        @media (max-width: 576px) {
-            .row-cols-md-3 .col {
-                flex: 1 0 100%;
-                /* Cards take up full width on small screens */
-                max-width: 100%;
-            }
-        }
-    </style>
-
-    <div class="container my-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>All Products</h2>
-            <select class="form-select sort-select" id="sort">
-                <option value="latest" {{ $sort === 'latest' ? 'selected' : '' }}>Latest</option>
-                <option value="price_asc" {{ $sort === 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
-                <option value="price_desc" {{ $sort === 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
-            </select>
-        </div>
-
-        <div id="products" class="row row-cols-1 row-cols-md-3 g-4">
-            <!-- JS will render products here -->
-            @foreach ($products as $product)
-                <div class="col">
-                    <div class="card product-card h-100">
-                        <img src="/storage/{{ $product->image }}" class="card-img-top" alt="{{ $product->name }}">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">{{ $product->name }}</h5>
-                            <p class="card-text">₱{{ number_format($product->price, 2) }}</p>
-                            <p class="card-text">Stock: {{ $product->quantity }}</p>
-                            <a href="{{ route('product.show', $product->id) }}" class="btn btn-primary">View Details</a>
-                        </div>
-                    </div>
+<div class="container py-5">
+    <div class="row g-4">
+        <!-- Sidebar Filter -->
+        <div class="col-lg-3">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <strong>Filter by Category</strong>
                 </div>
-            @endforeach
+                <div class="card-body category-filter">
+                    <form id="category-filter-form">
+                        @php
+                            $categories = [
+                                'Tiles',
+                                'Vinyl',
+                                'Borders',
+                                'Mosaics',
+                                'Sanitary Wares',
+                                'Tile Adhesive, Grout & Epoxy',
+                                'Tools, Tile Spacers & Levelers'
+                            ];
+                            $selectedCategory = request('category');
+                        @endphp
+
+                        @foreach ($categories as $category)
+                            <div>
+                                <input type="radio" name="category" id="cat-{{ Str::slug($category) }}" value="{{ $category }}"
+                                    {{ $selectedCategory === $category ? 'checked' : '' }}>
+                                <label for="cat-{{ Str::slug($category) }}">{{ $category }}</label>
+                            </div>
+                        @endforeach
+
+                        <button type="submit" class="btn btn-outline-primary btn-sm mt-3 w-100">Apply Filter</button>
+                    </form>
+                </div>
+            </div>
         </div>
 
-        <!-- Custom Pagination -->
-        <div class="pagination-container text-center mt-4">
-            <ul class="pagination">
-                @if ($products->onFirstPage())
-                    <li class="page-item disabled"><span class="page-link">« Previous</span></li>
-                @else
-                    <li class="page-item"><a href="{{ $products->previousPageUrl() }}" class="page-link">« Previous</a></li>
-                @endif
+        <!-- Products & Sort -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h5 mb-0">All Products</h2>
+                <select class="form-select sort-select" id="sort">
+                    <option value="latest" {{ $sort === 'latest' ? 'selected' : '' }}>Latest</option>
+                    <option value="price_asc" {{ $sort === 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
+                    <option value="price_desc" {{ $sort === 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
+                </select>
+            </div>
 
-                @for ($i = 1; $i <= $products->lastPage(); $i++)
-                    <li class="page-item {{ $i == $products->currentPage() ? 'active' : '' }}">
-                        <a href="{{ $products->url($i) }}" class="page-link">{{ $i }}</a>
-                    </li>
-                @endfor
+            @if ($products->count())
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+                    @foreach ($products as $product)
+                        <div class="col">
+                            <div class="product-card h-100">
+                                <img src="/storage/{{ $product->image }}" class="card-img-top rounded" alt="{{ $product->name }}">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title">{{ $product->name }}</h5>
+                                    <p class="card-text">₱{{ number_format($product->price, 2) }}</p>
+                                    <p class="card-text">Stock: {{ $product->quantity }}</p>
+                                    <a href="{{ route('product.show', $product->id) }}" class="btn btn-primary">View Details</a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="alert alert-info text-center mt-4">No products found.</div>
+            @endif
 
-                @if ($products->hasMorePages())
-                    <li class="page-item"><a href="{{ $products->nextPageUrl() }}" class="page-link">Next »</a></li>
-                @else
-                    <li class="page-item disabled"><span class="page-link">Next »</span></li>
-                @endif
-            </ul>
+            <!-- Pagination -->
+            <div class="pagination-container text-center mt-4">
+                <ul class="pagination">
+                    @if ($products->onFirstPage())
+                        <li class="page-item disabled"><span class="page-link">« Previous</span></li>
+                    @else
+                        <li class="page-item"><a href="{{ $products->previousPageUrl() }}" class="page-link">« Previous</a></li>
+                    @endif
+
+                    @for ($i = 1; $i <= $products->lastPage(); $i++)
+                        <li class="page-item {{ $i == $products->currentPage() ? 'active' : '' }}">
+                            <a href="{{ $products->url($i) }}" class="page-link">{{ $i }}</a>
+                        </li>
+                    @endfor
+
+                    @if ($products->hasMorePages())
+                        <li class="page-item"><a href="{{ $products->nextPageUrl() }}" class="page-link">Next »</a></li>
+                    @else
+                        <li class="page-item disabled"><span class="page-link">Next »</span></li>
+                    @endif
+                </ul>
+            </div>
         </div>
     </div>
+</div>
 
-    <script>
-        document.getElementById('sort').addEventListener('change', function () {
-            window.location.href = `/shop?sort=${this.value}`;
-        });
-    </script>
+<script>
+    document.getElementById('sort').addEventListener('change', function () {
+        const url = new URL(window.location.href);
+        url.searchParams.set('sort', this.value);
+        window.location.href = url.toString();
+    });
+
+    document.getElementById('category-filter-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const selectedCategory = document.querySelector('input[name="category"]:checked')?.value || '';
+        const url = new URL(window.location.href);
+        url.searchParams.set('category', selectedCategory);
+        window.location.href = url.toString();
+    });
+</script>
 @endsection
