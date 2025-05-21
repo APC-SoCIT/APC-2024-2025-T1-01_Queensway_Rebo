@@ -17,13 +17,17 @@ class WebsiteProductController extends Controller
     // Products page - Display all products with sorting and pagination   // Shop page - Display all products
     public function products(Request $request)
     {
-        // Get sort query parameter (default to 'latest')
         $sort = $request->query('sort', 'latest');
+        $category = $request->query('category'); // <-- get category filter from query string
 
-        // Prepare query
         $query = Product::query();
 
-        // Apply sorting based on $sort value
+        // Apply category filter
+        if ($category) {
+            $query->where('category', $category);
+        }
+
+        // Apply sorting
         if ($sort === 'price_asc') {
             $query->orderBy('price', 'asc');
         } elseif ($sort === 'price_desc') {
@@ -32,12 +36,11 @@ class WebsiteProductController extends Controller
             $query->latest();
         }
 
-        // Get paginated products
-        $products = $query->paginate(10);
+        $products = $query->paginate(10)->appends($request->query()); // keep filters in pagination links
 
-        // Return the view with the products and sort variable
-        return view('website.products', compact('products', 'sort'));
+        return view('website.products', compact('products', 'sort', 'category'));
     }
+
 
     // Single product detail page
     public function show($id)
@@ -45,4 +48,6 @@ class WebsiteProductController extends Controller
         $product = Product::findOrFail($id);
         return view('website.product-detail', compact('product'));
     }
+
+
 }

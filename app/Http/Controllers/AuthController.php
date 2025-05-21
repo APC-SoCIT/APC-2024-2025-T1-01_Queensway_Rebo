@@ -18,34 +18,36 @@ class AuthController extends Controller
     }
 
     // Handle user login
-// Handle user login
-public function login(Request $request)
-{
-    $credentials = $request->validate([
-        'email' => ['required', 'email'],
-        'password' => ['required'],
-    ]);
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-    if (Auth::attempt($credentials)) {
-        $user = Auth::user();
+        $remember = $request->filled('remember');
 
-        if (!$user->hasVerifiedEmail()) {
-            Auth::logout(); // log out unverified
-            return back()->withInput($request->only('email'))
-                ->with('showResend', true)
-                ->withErrors(['email' => 'You must verify your email address.']);
+        if (Auth::attempt($credentials, $remember)) {
+            $user = Auth::user();
+
+            if (!$user->hasVerifiedEmail()) {
+                Auth::logout();
+                return back()->withInput($request->only('email'))
+                    ->with('showResend', true)
+                    ->withErrors(['email' => 'You must verify your email address.']);
+            }
+
+            $request->session()->regenerate();
+            return redirect()->intended('/user/dashboard');
         }
 
-        $request->session()->regenerate();
-        return redirect()->intended('/user/dashboard');
+        return back()->withErrors([
+            'email' => 'Invalid credentials.',
+        ])->withInput($request->only('email'));
     }
 
-    return back()->withErrors([
-        'email' => 'Invalid credentials.',
-    ])->withInput($request->only('email'));
-}
 
-    
+
 
     // User registration form
     public function showRegistrationForm()
@@ -61,11 +63,11 @@ public function login(Request $request)
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
-        
+
         event(new Registered($user));
-        
+
         return redirect()->route('login')->with('message', 'Registration successful. Please check your email to verify your account before logging in.');
-        
+
     }
 
     // Handle logout
@@ -78,5 +80,5 @@ public function login(Request $request)
         return redirect('/');
     }
 
-    
+
 }

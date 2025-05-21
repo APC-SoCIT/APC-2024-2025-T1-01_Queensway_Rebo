@@ -7,20 +7,27 @@ use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
 {
-    // Display all products
     public function index()
     {
         $products = Product::paginate(10);
         return view('admin.products.index', compact('products'));
     }
 
-    // Show form to create a new product
     public function create()
     {
-        return view('admin.products.create');
+        $categories = [
+            'Tiles',
+            'Vinyl',
+            'Borders',
+            'Mosaics',
+            'Sanitary Wares',
+            'Tile Adhesive, Grout & Epoxy',
+            'Tools, Tile Spacers & Levelers'
+        ];
+
+        return view('admin.products.create', compact('categories'));
     }
 
-    // Store a new product
     public function store(Request $request)
     {
         $request->validate([
@@ -28,26 +35,37 @@ class ProductController extends Controller
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'quantity' => 'required|integer',
+            'category' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
-        $product = new Product($request->only(['name', 'price', 'description', 'quantity']));
+        $product = new Product($request->only(['name', 'price', 'description', 'quantity', 'category']));
+
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('products', 'public');
             $product->image = $imagePath;
         }
+
         $product->save();
 
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully!');
     }
 
-    // Show form to edit a product
     public function edit(Product $product)
     {
-        return view('admin.products.edit', compact('product'));
+        $categories = [
+            'Tiles',
+            'Vinyl',
+            'Borders',
+            'Mosaics',
+            'Sanitary Wares',
+            'Tile Adhesive, Grout & Epoxy',
+            'Tools, Tile Spacers & Levelers'
+        ];
+
+        return view('admin.products.edit', compact('product', 'categories'));
     }
 
-    // Update a product
     public function update(Request $request, Product $product)
     {
         $request->validate([
@@ -55,10 +73,11 @@ class ProductController extends Controller
             'price' => 'required|numeric',
             'description' => 'nullable|string',
             'quantity' => 'required|integer',
+            'category' => 'required|string|max:255',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif',
         ]);
 
-        $product->update($request->only(['name', 'price', 'description', 'quantity']));
+        $product->fill($request->only(['name', 'price', 'description', 'quantity', 'category']));
 
         if ($request->hasFile('image')) {
             $imagePath = $request->file('image')->store('products', 'public');
@@ -70,7 +89,6 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Product updated successfully!');
     }
 
-    // Delete a product
     public function destroy(Product $product)
     {
         $product->delete();
@@ -78,4 +96,3 @@ class ProductController extends Controller
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully!');
     }
 }
-
