@@ -6,57 +6,87 @@
             width: 100%;
             height: 200px;
             object-fit: cover;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
         }
 
         .product-card {
-            transition: transform 0.2s;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            transition: all 0.3s ease-in-out;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
         }
 
         .product-card:hover {
-            transform: scale(1.05);
+            transform: scale(1.03);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
         }
 
         .card-title {
             font-size: 1.1rem;
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
         }
 
         .card-text {
             font-size: 0.9rem;
-            color: #555;
+            color: #666;
         }
 
         .btn-primary {
+            font-size: 0.85rem;
+            padding: 6px 14px;
+            border-radius: 20px;
+        }
+
+        .hero-section {
+            background: linear-gradient(to right, #343a40, #495057);
+            color: #fff;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .hero-section .btn-primary {
+            padding: 10px 24px;
+            font-size: 1rem;
+            border-radius: 30px;
+        }
+
+        footer {
+            background-color: #f8f9fa;
+            padding: 20px 0;
+            text-align: center;
             font-size: 0.9rem;
-            padding: 8px 16px;
+            color: #555;
         }
     </style>
 
     <!-- Hero Section -->
-    <div class="bg-dark text-white py-5">
-        <div class="container text-center">
-            <h1>Welcome to Queens Rebo</h1>
-            <p class="lead">Discover our exclusive collection of products</p>
-            <a href="/shop" class="btn btn-primary btn-lg">Shop Now</a>
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="display-5 fw-bold">Welcome to Queens Rebo</h1>
+            <p class="lead">Discover our exclusive collection of high-quality products</p>
+            <a href="/shop" class="btn btn-primary btn-lg mt-3">Shop Now</a>
         </div>
     </div>
 
     <!-- Product Cards Section -->
     <div class="container my-5">
         <h2 class="text-center mb-4">Featured Products</h2>
-        <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
             @foreach($latestProducts as $product)
                 <div class="col d-flex">
-                    <div class="card product-card w-100 h-100 d-flex flex-column">
-                        <img src="/storage/{{ $product->image }}" class="card-img-top" alt="{{ $product->name }}">
+                    <div class="product-card w-100 h-100">
+                        <img src="/storage/{{ $product->image }}" alt="{{ $product->name }}">
                         <div class="card-body text-center d-flex flex-column">
                             <h5 class="card-title">{{ $product->name }}</h5>
                             <p class="card-text">₱{{ number_format($product->price, 2) }}</p>
                             <p class="card-text">Stock: {{ $product->quantity }}</p>
-                            <a href="/product/{{ $product->id }}" class="btn btn-primary mt-auto">View Details</a>
+                            <a href="/product/{{ $product->id }}" class="btn btn-primary mt-auto align-self-center mb-3">View
+                                Details</a>
                         </div>
                     </div>
                 </div>
@@ -65,8 +95,8 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-light py-4">
-        <div class="container text-center">
+    <footer>
+        <div class="container">
             <p>&copy; 2025 Queens Rebo. All rights reserved.</p>
         </div>
     </footer>

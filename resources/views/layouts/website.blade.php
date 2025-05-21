@@ -24,6 +24,8 @@
         <div class="content w-100">
             <!-- Navbar -->
             @include('layouts.partials.website-navbar')
+            @include('website.faq-chat')
+
 
             <div class="container-fluid py-4">
                 @yield('content')
