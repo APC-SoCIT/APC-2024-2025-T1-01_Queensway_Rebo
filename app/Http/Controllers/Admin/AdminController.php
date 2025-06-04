@@ -1,31 +1,24 @@
 <?php
+
+
 namespace App\Http\Controllers\Admin;
 
+use App\Models\User;
 use App\Models\Order;
-use Illuminate\Http\Request;
+use App\Models\Product;
 use App\Http\Controllers\Controller;
 
-class AdminOrderController extends Controller
+class AdminController extends Controller
 {
-    public function index()
-    {
-        $orders = Order::with(['items.product', 'user'])->latest()->get();
-        return view('admin.orders.index', compact('orders'));
-    }
+    // public function dashboard()
+    // {
+    //     // Fetch the data for the dashboard
+    //     $totalUsers = User::count();
+    //     $totalRevenue = Order::where('order_status', 'paid')->sum('total_amount');
+    //     $pendingOrders = Order::where('order_status', 'pending')->count();
+    //     $totalProducts = Product::count();
 
-    public function markedPreparing(Order $order)
-    {
-        $order->order_status = 'preparing';
-        $order->save();
-
-        return redirect()->back()->with('success', 'Order marked as preparing.');
-    }
-
-    public function markShipped(Order $order)
-    {
-        $order->order_status = 'shipped';
-        $order->save();
-
-        return redirect()->back()->with('success', 'Order marked as shipped.');
-    }
+    //     // Pass the data to the view
+    //     return view('admin.dashboard', compact('totalUsers', 'totalRevenue', 'pendingOrders', 'totalProducts'));
+    // }
 }

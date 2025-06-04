@@ -20,29 +20,30 @@ class AdminAuthController extends Controller
     }
 
     // Handle admin login
-public function login(Request $request)
-{
-    $credentials = $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+    public function login(Request $request)
+    {
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-    if (Auth::guard('admin')->attempt($credentials)) {
-        $admin = Auth::guard('admin')->user();
+        if (Auth::guard('admin')->attempt($credentials)) {
+            $admin = Auth::guard('admin')->user();
 
-        if (!$admin->hasVerifiedEmail()) {
-            Auth::guard('admin')->logout();
-            return back()->withInput($request->only('email'))
-                 ->with('showResend', true)
-                 ->withErrors(['email' => 'You must verify your email address.']);
+            if (!$admin->hasVerifiedEmail()) {
+                Auth::guard('admin')->logout();
+                return back()->withInput($request->only('email'))
+                    ->with('showResend', true)
+                    ->withErrors(['email' => 'You must verify your email address.']);
+            }
+
+            $request->session()->regenerate();
+            return redirect()->route('admin.dashboard');
+
         }
 
-        $request->session()->regenerate();
-        return redirect()->intended('admin/dashboard');
+        return back()->withErrors(['email' => 'Invalid credentials']);
     }
-
-    return back()->withErrors(['email' => 'Invalid credentials']);
-}
 
 
     // Admin registration form
@@ -54,7 +55,7 @@ public function login(Request $request)
     // Handle admin registration
     public function register(Request $request)
     {
-    
+
         $admin = Admin::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -62,7 +63,7 @@ public function login(Request $request)
         ]);
 
         event(new Registered($admin));
-        
+
         return redirect()->route('admin.login')->with('message', 'Registration successful. Please check your email to verify your account before logging in.');
     }
 

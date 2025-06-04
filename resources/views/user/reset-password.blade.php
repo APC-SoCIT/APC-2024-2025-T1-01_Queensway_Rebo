@@ -67,13 +67,9 @@
             <img src="{{ asset('storage/images/logo.png') }}" alt="Queens Rebo Logo">
         </div>
 
-        <!-- Forgot Password Form Section -->
+        <!-- Reset Password Form Section -->
         <div class="auth-form-section">
-            <h2 class="text-center mb-4">Forgot Password</h2>
-
-            @if (session('status'))
-                <div class="alert alert-success">{{ session('status') }}</div>
-            @endif
+            <h2 class="text-center mb-4">Reset Password</h2>
 
             @if ($errors->any())
                 <div class="alert alert-danger">
@@ -83,17 +79,28 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('password.email') }}" onsubmit="showForgotSpinner(event)">
+            <form method="POST" action="{{ route('password.update') }}" onsubmit="showResetSpinner(event)">
                 @csrf
+                <input type="hidden" name="token" value="{{ request()->route('token') }}">
 
                 <div class="mb-3">
                     <label for="email" class="form-label">Email Address</label>
-                    <input type="email" id="email" class="form-control" name="email" value="{{ old('email') }}" required autofocus>
+                    <input id="email" type="email" name="email" class="form-control" value="{{ old('email', request()->email) }}" required autofocus>
                 </div>
 
-                <button type="submit" id="forgot-btn" class="btn btn-primary w-100">
-                    <span class="spinner-border spinner-border-sm d-none" id="forgot-spinner" role="status" aria-hidden="true"></span>
-                    <span id="forgot-text">Send Password Reset Link</span>
+                <div class="mb-3">
+                    <label for="password" class="form-label">New Password</label>
+                    <input id="password" type="password" name="password" class="form-control" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password_confirmation" class="form-label">Confirm Password</label>
+                    <input id="password_confirmation" type="password" name="password_confirmation" class="form-control" required>
+                </div>
+
+                <button type="submit" id="reset-btn" class="btn btn-primary w-100">
+                    <span class="spinner-border spinner-border-sm d-none" id="reset-spinner" role="status" aria-hidden="true"></span>
+                    <span id="reset-text">Reset Password</span>
                 </button>
             </form>
 
@@ -106,14 +113,14 @@
 </div>
 
 <script>
-    function showForgotSpinner(event) {
-        const spinner = document.getElementById('forgot-spinner');
-        const text = document.getElementById('forgot-text');
-        const btn = document.getElementById('forgot-btn');
+    function showResetSpinner(event) {
+        const spinner = document.getElementById('reset-spinner');
+        const text = document.getElementById('reset-text');
+        const btn = document.getElementById('reset-btn');
 
         btn.disabled = true;
         spinner.classList.remove('d-none');
-        text.textContent = 'Sending...';
+        text.textContent = 'Resetting...';
     }
 </script>
 @endsection

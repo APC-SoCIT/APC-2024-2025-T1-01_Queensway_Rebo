@@ -11,8 +11,20 @@
             color: #333;
         }
 
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 120px;
+        }
+
         h1 {
             color: #444;
+            margin: 0 0 10px 0;
         }
 
         table {
@@ -38,14 +50,19 @@
 </head>
 
 <body>
-    <h1>Invoice</h1>
-    <p><strong>Order #:</strong> {{ $order->order_number }}</p>
 
-    <h4>Ship To:</h4>
-    <p>
-        {{ $order->recipient_name }}<br>
-        {{ $order->shipping_address }}
-    </p>
+    <div class="header">
+        <div>
+            <h1>Invoice</h1>
+            <p><strong>Order #:</strong> {{ $order->order_number }}</p>
+
+            <h4>Ship To:</h4>
+            <p>
+                {{ $order->recipient_name }}<br>
+                {{ $order->shipping_address }}
+            </p>
+        </div>
+    </div>
 
     <table>
         <thead>
@@ -71,6 +88,7 @@
             </tr>
         </tbody>
     </table>
+
 </body>
 
 </html>

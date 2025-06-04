@@ -69,7 +69,7 @@
 
         <!-- Forgot Password Form Section -->
         <div class="auth-form-section">
-            <h2 class="text-center mb-4">Forgot Password</h2>
+            <h2 class="text-center mb-4">Admin Forgot Password</h2>
 
             @if (session('status'))
                 <div class="alert alert-success">{{ session('status') }}</div>
@@ -83,7 +83,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('password.email') }}" onsubmit="showForgotSpinner(event)">
+            <form method="POST" action="{{ route('admin.password.email') }}" onsubmit="showForgotSpinner(event)">
                 @csrf
 
                 <div class="mb-3">
@@ -98,7 +98,7 @@
             </form>
 
             <div class="link-container mt-4">
-                <a href="{{ route('login') }}" class="btn btn-link text-primary">Back to Login</a> |
+                <a href="{{ route('admin.login') }}" class="btn btn-link text-primary">Back to Admin Login</a> |
                 <a href="{{ url('/') }}" class="btn btn-link text-primary">Return to Website</a>
             </div>
         </div>

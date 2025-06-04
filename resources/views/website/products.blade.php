@@ -82,6 +82,7 @@
                                 'Borders',
                                 'Mosaics',
                                 'Sanitary Wares',
+                                'WPC Panels & Wall Cladding',
                                 'Tile Adhesive, Grout & Epoxy',
                                 'Tools, Tile Spacers & Levelers'
                             ];
@@ -122,7 +123,13 @@
                                 <div class="card-body text-center">
                                     <h5 class="card-title">{{ $product->name }}</h5>
                                     <p class="card-text">₱{{ number_format($product->price, 2) }}</p>
-                                    <p class="card-text">Stock: {{ $product->quantity }}</p>
+
+                                    @if ($product->quantity > 0)
+                                        <p class="card-text">Stock: {{ $product->quantity }}</p>
+                                    @else
+                                        <p class="card-text text-danger fw-bold">Out of Stock</p>
+                                    @endif
+
                                     <a href="{{ route('product.show', $product->id) }}" class="btn btn-primary">View Details</a>
                                 </div>
                             </div>
@@ -159,19 +166,42 @@
     </div>
 </div>
 
+<!-- Loading Overlay -->
+<x-loading-overlay id="view-loading" />
+
 <script>
+    function showLoading() {
+        document.getElementById('view-loading').classList.add('active');
+    }
+
+    // Sorting change
     document.getElementById('sort').addEventListener('change', function () {
+        showLoading();
         const url = new URL(window.location.href);
         url.searchParams.set('sort', this.value);
         window.location.href = url.toString();
     });
 
+    // Filter submit
     document.getElementById('category-filter-form').addEventListener('submit', function (e) {
         e.preventDefault();
+        showLoading();
         const selectedCategory = document.querySelector('input[name="category"]:checked')?.value || '';
         const url = new URL(window.location.href);
         url.searchParams.set('category', selectedCategory);
         window.location.href = url.toString();
+    });
+
+    // View Details buttons click
+    document.querySelectorAll('.btn-primary').forEach(btn => {
+        if (btn.textContent.trim() === 'View Details') {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showLoading();
+                const href = this.href;
+                setTimeout(() => window.location.href = href, 200);
+            });
+        }
     });
 </script>
 @endsection

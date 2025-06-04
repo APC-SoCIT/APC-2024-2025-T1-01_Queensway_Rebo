@@ -15,6 +15,7 @@
     <!-- Custom CSS (optional) -->
     <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    @stack('styles')
 
 </head>
 
@@ -27,7 +28,7 @@
             @include('website.faq-chat')
 
 
-            <div class="container-fluid py-4">
+            <div class="">
                 @yield('content')
             </div>
         </div>

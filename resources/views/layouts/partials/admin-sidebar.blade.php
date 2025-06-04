@@ -1,21 +1,56 @@
-<div class="sidebar bg-dark text-white p-3" style="width: 250px; height: 150vh;">
-    <h4 class="text-center py-3">Admin Panel</h4>
-    <a href="{{ route('admin.dashboard') }}" class="text-white d-block mb-3">
-        <i class="fas fa-chart-line me-2"></i> Dashboard
+<aside class="main-sidebar sidebar-dark-primary elevation-4">
+    <!-- Brand Logo -->
+    <a href="{{ route('admin.dashboard') }}" class="brand-link text-center">
+        <span class="brand-text font-weight-light">Admin Panel</span>
     </a>
-    <a href="{{ route('admin.products.index') }}" class="text-white d-block mb-3">
-        <i class="fas fa-box me-2"></i> Products
-    </a>
-    <a href="{{ route('admin.orders.index') }}" class="text-white d-block mb-3">
-        <i class="fas fa-shopping-cart me-2"></i> Orders
-    </a>
-    <a href="" class="text-white d-block mb-3">
-        <i class="fas fa-users me-2"></i> Users
-    </a>
-    <form method="POST" action="{{ route('admin.logout') }}">
-        @csrf
-        <button type="submit" class="btn btn-link text-white w-100 text-start px-3">
-            <i class="fas fa-sign-out-alt me-2"></i> Logout
-        </button>
-    </form>
+
+<!-- Sidebar user panel -->
+<div class="user-panel mt-3 pb-3 mb-3 d-flex align-items-center px-3 ml-2">
+    <i class="nav-icon fas fa-user"></i>
+    <div class="info ml-2">
+        <div class="d-block text-white">{{ Auth::user()->name ?? 'Guest' }}</div>
+    </div>
 </div>
+
+
+
+        <!-- Sidebar Menu -->
+        <nav class="mt-3">
+            <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+                <li class="nav-item">
+                    <a href="{{ route('admin.dashboard') }}" class="nav-link">
+                        <i class="nav-icon fas fa-chart-line"></i>
+                        <p>Dashboard</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.products.index') }}" class="nav-link">
+                        <i class="nav-icon fas fa-box"></i>
+                        <p>Products</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.orders.index') }}" class="nav-link">
+                        <i class="nav-icon fas fa-shopping-cart"></i>
+                        <p>Orders</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-users"></i>
+                        <p>Users</p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="btn btn-link nav-link text-left">
+                            <i class="nav-icon fas fa-sign-out-alt"></i>
+                            <p>Logout</p>
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</aside>

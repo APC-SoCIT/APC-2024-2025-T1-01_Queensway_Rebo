@@ -2,228 +2,166 @@
 
 @section('content')
     <style>
-        .order-card {
-            background-color: #fff;
-            border: 1px solid #ddd;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .order-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .order-item-image {
-            border-radius: 8px;
-            border: 1px solid #ddd;
-        }
-
-        .order-item {
-            align-items: center;
+        .account-wrapper {
             display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
         }
 
-        .order-total {
-            font-size: 1.1rem;
-            font-weight: bold;
+        .account-sidebar {
+            width: 250px;
+            border-right: 1px solid #eee;
+            padding-right: 1rem;
+        }
+
+        .account-sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .account-sidebar li {
+            padding: 0.6rem 0;
+            font-size: 0.95rem;
+            cursor: pointer;
             color: #333;
         }
 
-        .badge {
-            font-size: 0.9rem;
-            padding: 8px 12px;
-            border-radius: 20px;
-            text-transform: capitalize;
-        }
-
-        .badge-warning {
-            background-color: #f0ad4e;
-            color: white;
-        }
-
-        .badge-success {
-            background-color: #5bc0de;
-            color: white;
-        }
-
-        .badge-danger {
-            background-color: #d9534f;
-            color: white;
-        }
-
-        /* Shipping Progress Path */
-        .shipping-progress {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-
-        .shipping-step {
-            position: relative;
-            text-align: center;
-            flex-grow: 1;
-        }
-
-        .shipping-step .step-circle {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            border: 2px solid #ddd;
-            background-color: #fff;
-            margin: 0 auto;
-            line-height: 18px;
+        .account-sidebar li.active {
             font-weight: bold;
-            font-size: 12px;
-            color: #ddd;
+            border-left: 3px solid orange;
+            padding-left: 10px;
         }
 
-        .shipping-step.completed .step-circle {
-            background-color: #28a745;
-            border-color: #28a745;
-            color: white;
+        .orders-table-container {
+            flex: 1;
         }
 
-        .shipping-step.current .step-circle {
-            background-color: #007bff;
-            border-color: #007bff;
-            color: white;
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
         }
 
-        .shipping-step .step-label {
-            margin-top: 5px;
-            font-size: 0.8rem;
-            color: #333;
+        .orders-table th,
+        .orders-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
         }
 
-        /* Adjust the order header to make room for the caret button */
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem;
-            cursor: pointer;
+        .orders-table th {
+            background-color: #f9f9f9;
         }
 
-        .order-header h4 {
-            margin: 0;
+        .orders-table a {
+            text-decoration: none;
+            color: #007bff;
+            margin-right: 0.5rem;
         }
 
-        .order-header .collapse-btn {
-            font-size: 1.5rem;
-            color: white;
-            border: none;
-            background: transparent;
-            cursor: pointer;
+        .orders-table a:hover {
+            text-decoration: underline;
         }
 
-        .order-date {
+        .pagination-controls {
+            margin-top: 1rem;
             font-size: 0.9rem;
-            color: #ddd;
-            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .pagination-controls select {
+            margin-left: 0.5rem;
+        }
+
+        .account-sidebar a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .account-sidebar a:hover {
+            text-decoration: underline;
+            color: orange; /* Optional hover effect */
         }
     </style>
 
-    <div class="container my-5">
-        <h2 class="text-center mb-4">Your Orders</h2>
+    <div class="container mt-4">
+        <h2 class="mb-4">My Orders</h2>
 
-        @forelse ($orders as $order)
-            <div class="order-card mb-4 shadow-sm rounded">
-                <!-- Order Header (Clickable to Expand/Collapse) -->
-                <div class="order-header bg-primary text-white p-4 rounded-top" data-bs-toggle="collapse"
-                    data-bs-target="#orderDetails{{ $order->id }}" aria-expanded="false"
-                    aria-controls="orderDetails{{ $order->id }}">
-                    <div class="d-flex w-100 justify-content-between align-items-center">
-                        <div>
-                            <h4 class="mb-1">
-                                Order #{{ $order->order_number }}
-                            </h4>
-                            <div class="order-date">
-                                Placed on {{ $order->created_at->format('F j, Y') }}
-                            </div>
-                        </div>
-                        <button class="collapse-btn" id="collapse-btn{{ $order->id }}">
-                            <i class="bi bi-caret-down-fill"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Shipping Progress Path -->
-                <div class="shipping-progress">
-                    <div
-                        class="shipping-step @if($order->order_status === 'paid' || $order->order_status === 'preparing') current @elseif($order->order_status === 'completed') completed @endif">
-                        <div class="step-circle">1</div>
-                        <div class="step-label">Paid</div>
-                    </div>
-                    <div
-                        class="shipping-step @if($order->order_status === 'preparing') current @elseif($order->order_status === 'completed') completed @endif">
-                        <div class="step-circle">2</div>
-                        <div class="step-label">Preparing</div>
-                    </div>
-                    <div
-                        class="shipping-step @if($order->order_status === 'shipped') current @elseif($order->order_status === 'completed') completed @endif">
-                        <div class="step-circle">3</div>
-                        <div class="step-label">Shipped</div>
-                    </div>
-                    <div class="shipping-step @if($order->order_status === 'completed') current @endif">
-                        <div class="step-circle">4</div>
-                        <div class="step-label">Completed</div>
-                    </div>
-                </div>
-
-                <!-- Collapsible Order Details -->
-                <div id="orderDetails{{ $order->id }}" class="order-details collapse p-4 bg-light rounded-bottom">
-                    <h5 class="mb-3">Order Summary</h5>
-
-                    @foreach ($order->items as $item)
-                        <div class="d-flex align-items-center order-item mb-3">
-                            <!-- Item Image -->
-                            <img src="/storage/{{ $item->product->image }}" alt="{{ $item->product->name }}"
-                                class="order-item-image" style="width: 80px; height: 80px; object-fit: cover;">
-                            <div class="item-info ml-3 flex-grow-1">
-                                <strong>{{ $item->product->name }}</strong><br>
-                                Quantity: {{ $item->quantity }}<br>
-                                ₱{{ number_format($item->product->price, 2) }}
-                            </div>
-                            <div class="ml-auto">
-                                ₱{{ number_format($item->quantity * $item->product->price, 2) }}
-                            </div>
-                        </div>
-                    @endforeach
-
-                    <!-- Total Amount -->
-                    <div class="d-flex justify-content-between mt-4">
-                        <span class="order-total font-weight-bold">Total</span>
-                        <span class="order-total font-weight-bold">₱{{ number_format($order->total_amount, 2) }}</span>
-                    </div>
-
-                    <!-- Order Status -->
-                    <div class="mt-3">
-                        <span class="badge 
-                                    @if($order->order_status === 'paid') badge-warning
-                                    @elseif($order->order_status === 'completed') badge-success
-                                    @elseif($order->order_status === 'cancelled') badge-danger
-                                    @endif">
-                            {{ ucfirst($order->order_status) }}
-                        </span>
-                    </div>
-                </div>
+        <div class="account-wrapper">
+            <!-- Sidebar -->
+            <div class="account-sidebar">
+                <ul>
+                    <li class="active">My Orders</li>
+                    <li><a href="{{ route('user.account') }}">Account Information</a></li>
+                </ul>
             </div>
 
-            <script>
-                // Dynamic caret toggle for each order
-                const collapseBtn = document.getElementById('collapse-btn{{ $order->id }}');
-                const orderDetails = document.getElementById('orderDetails{{ $order->id }}');
+            <!-- Orders Table -->
+            <div class="orders-table-container">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Date</th>
+                            <th>Ship To</th>
+                            <th>Order Total</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($orders as $order)
+                            <tr>
+                                <td>{{ str_pad($order->order_number, 8, '0', STR_PAD_LEFT) }}</td>
+                                <td>{{ $order->created_at->format('d.m.y') }}</td>
+                                <td>{{ $order->recipient_name }}</td>
+                                <td>₱{{ number_format($order->total_amount, 2) }}</td>
+                                <td>{{ ucfirst($order->order_status) }}</td>
+                                <td>
+                                    <a href="{{ route('orders.show', $order) }}">Track your order</a>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No orders found.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
 
-                orderDetails.addEventListener('show.bs.collapse', function () {
-                    collapseBtn.innerHTML = '<i class="bi bi-caret-up-fill"></i>';
-                });
+                {{-- Pagination --}}
+                @if($orders->hasPages())
+                    <div class="card-footer clearfix mt-3">
+                        <div class="float-left mt-2">
+                            Showing {{ $orders->firstItem() }} to {{ $orders->lastItem() }} of {{ $orders->total() }} orders
+                        </div>
+                        <ul class="pagination pagination-sm m-0 float-right">
+                            {{-- Previous Page Link --}}
+                            @if ($orders->onFirstPage())
+                                <li class="page-item disabled"><span class="page-link">« Previous</span></li>
+                            @else
+                                <li class="page-item"><a class="page-link" href="{{ $orders->previousPageUrl() }}" rel="prev">« Previous</a></li>
+                            @endif
 
-                orderDetails.addEventListener('hide.bs.collapse', function () {
-                    collapseBtn.innerHTML = '<i class="bi bi-caret-down-fill"></i>';
-                });
-            </script>
-        @empty
-            <p class="text-center">No orders found.</p>
-        @endforelse
+                            {{-- Pagination Elements --}}
+                            @for ($i = 1; $i <= $orders->lastPage(); $i++)
+                                <li class="page-item {{ $i == $orders->currentPage() ? 'active' : '' }}">
+                                    <a class="page-link" href="{{ $orders->url($i) }}">{{ $i }}</a>
+                                </li>
+                            @endfor
+
+                            {{-- Next Page Link --}}
+                            @if ($orders->hasMorePages())
+                                <li class="page-item"><a class="page-link" href="{{ $orders->nextPageUrl() }}" rel="next">Next »</a></li>
+                            @else
+                                <li class="page-item disabled"><span class="page-link">Next »</span></li>
+                            @endif
+                        </ul>
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
 @endsection

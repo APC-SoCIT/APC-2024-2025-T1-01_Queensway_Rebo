@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
+use App\Notifications\AdminResetPassword;
 
 class Admin extends Authenticatable implements MustVerifyEmail
 {
@@ -47,5 +48,13 @@ class Admin extends Authenticatable implements MustVerifyEmail
             }
         });
     }
+
+
+
+public function sendPasswordResetNotification($token)
+{
+    $this->notify(new AdminResetPassword($token));
+}
+
 
 }

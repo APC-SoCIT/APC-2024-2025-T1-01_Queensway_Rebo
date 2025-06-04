@@ -9,9 +9,10 @@ class AdminOrderController extends Controller
 {
     public function index()
     {
-        $orders = Order::with(['items.product', 'user'])->latest()->get();
+        $orders = Order::with(['items.product', 'user'])->latest()->paginate(10);
         return view('admin.orders.index', compact('orders'));
     }
+    
 
     public function markedPreparing(Order $order)
     {

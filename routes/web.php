@@ -1,6 +1,8 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\User\UserController;
+use App\Http\Controllers\UserDashboardController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Website\WebsiteFaqBotController;
@@ -18,6 +20,9 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\User\ForgotPasswordController;
 use App\Http\Controllers\User\ResetPasswordController;
+use App\Http\Controllers\Admin\AdminForgotPasswordController;
+use App\Http\Controllers\Admin\AdminResetPasswordController;
+
 
 // Public Routes
 Route::get('/', [WebsiteProductController::class, 'landingPage']);
@@ -32,10 +37,19 @@ Route::prefix('user')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login.submit');
     Route::get('register', [AuthController::class, 'showRegistrationForm'])->name('register');
     Route::post('register', [AuthController::class, 'register'])->name('register.submit');
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+
+
 });
 Route::prefix('user')->middleware(['auth', 'verified'])->group(function () {
     Route::post('logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('dashboard', [DashboardController::class, 'dashboard'])->name('user.dashboard');
+    Route::get('dashboard', [UserDashboardController::class, 'dashboard'])->name('user.dashboard');
+    Route::get('account-info', [UserController::class, 'accountInfo'])->name('user.account');
+Route::put('account-update-password', [UserController::class, 'updatePassword'])->name('user.update-password');
+
 });
 
 // Admin Authentication Routes
@@ -44,11 +58,16 @@ Route::prefix('admin')->group(function () {
     Route::post('login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
     Route::get('register', [AdminAuthController::class, 'showRegistrationForm'])->name('admin.register');
     Route::post('register', [AdminAuthController::class, 'register'])->name('admin.register.submit');
+    Route::get('forgot-password', [AdminForgotPasswordController::class, 'showLinkRequestForm'])->name('admin.password.request');
+    Route::post('forgot-password', [AdminForgotPasswordController::class, 'sendResetLinkEmail'])->name('admin.password.email');
+    Route::get('reset-password/{token}', [AdminResetPasswordController::class, 'showResetForm'])->name('admin.password.reset');
+    Route::post('reset-password', [AdminResetPasswordController::class, 'reset'])->name('admin.password.update');
+    
 });
 // Admin Dashboard (only accessible for logged-in admins)
 Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::post('logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
-    Route::get('dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+    Route::get('dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     // Product Management
     Route::prefix('products')->name('admin.products.')->group(function () {
@@ -138,7 +157,7 @@ Route::post('/checkout/complete', [WebsiteCheckoutController::class, 'complete']
 Route::get('/payment-success', [WebsiteCheckoutController::class, 'paymentSuccess']);
 
 
-Route::get('/orders/{id}', [OrderController::class, 'show'])->name('orders.show');
+
 
 Route::get('/faq-bot', function () {
     return view('website.faq-chat');
@@ -146,18 +165,23 @@ Route::get('/faq-bot', function () {
 
 Route::post('/faq-bot', [WebsiteFaqBotController::class, 'handle'])->name('faq.bot');
 
-Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
+
+Route::get('/admin/dashboard/sales-data', [AdminDashboardController::class, 'salesData'])->name('admin.dashboard.salesData');
 
 
-// Route::get('/dashboard', [DashboardController::class, 'dashboard'])
-//     ->name('user.dashboard')
-//     ->middleware(['auth', 'verified']);
+Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
 
-// Route::middleware(['auth', 'admin'])->group(function () {
-//     Route::get('/admin/orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
-//     Route::post('/admin/orders/{order}/mark-shipped', [AdminOrderController::class, 'markShipped'])->name('admin.orders.markShipped');
-// });
+Route::get('/order/{order}/invoice', [OrderController::class, 'viewInvoice'])->name('order.invoice');
+
+Route::get('/tile-calculator', function () {
+    return view('website.tile-calculator');
+})->name('tile.calculator');
+
+Route::get('/installation-videos', function () {
+    return view('website.installation-videos');
+})->name('installation.videos');
+
+
+
+
 

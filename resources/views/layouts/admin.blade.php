@@ -4,36 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome for icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-    <!-- Chart.js for charts -->
+
+    <!-- AdminLTE CSS (Bootstrap 4 + AdminLTE UI) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <!-- Custom CSS (optional) -->
     <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-
 </head>
-<body>
 
-    <div class="d-flex">
-        <!-- Sidebar -->
-        @include('layouts.partials.admin-sidebar')
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    
+    <!-- Navbar -->
+    @include('layouts.partials.admin-navbar')
 
-        <div class="content w-100">
-            <!-- Navbar -->
-            @include('layouts.partials.admin-navbar')
+    <!-- Main Sidebar Container -->
+    @include('layouts.partials.admin-sidebar')
 
-            <div class="container-fluid py-4">
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <div class="content pt-3">
+            <div class="container-fluid">
                 @yield('content')
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Custom JS (optional) -->
-    <script src="{{ asset('js/custom.js') }}"></script>
+
+
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+<script src="{{ asset('js/custom.js') }}"></script>
+@yield('js')
+
 </body>
+
 </html>

@@ -21,6 +21,7 @@ class ProductController extends Controller
             'Borders',
             'Mosaics',
             'Sanitary Wares',
+            'WPC Panels & Wall Cladding',
             'Tile Adhesive, Grout & Epoxy',
             'Tools, Tile Spacers & Levelers'
         ];
@@ -59,6 +60,7 @@ class ProductController extends Controller
             'Borders',
             'Mosaics',
             'Sanitary Wares',
+            'WPC Panels & Wall Cladding',
             'Tile Adhesive, Grout & Epoxy',
             'Tools, Tile Spacers & Levelers'
         ];
