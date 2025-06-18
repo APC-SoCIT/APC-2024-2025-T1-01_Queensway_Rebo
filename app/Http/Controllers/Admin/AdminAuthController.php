@@ -6,10 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Auth\Events\Registered;
 use App\Http\Controllers\Controller;
-
-
 
 class AdminAuthController extends Controller
 {
@@ -28,44 +25,13 @@ class AdminAuthController extends Controller
         ]);
 
         if (Auth::guard('admin')->attempt($credentials)) {
-            $admin = Auth::guard('admin')->user();
-
-            if (!$admin->hasVerifiedEmail()) {
-                Auth::guard('admin')->logout();
-                return back()->withInput($request->only('email'))
-                    ->with('showResend', true)
-                    ->withErrors(['email' => 'You must verify your email address.']);
-            }
-
             $request->session()->regenerate();
             return redirect()->route('admin.dashboard');
-
         }
 
         return back()->withErrors(['email' => 'Invalid credentials']);
     }
 
-
-    // Admin registration form
-    public function showRegistrationForm()
-    {
-        return view('admin.register');
-    }
-
-    // Handle admin registration
-    public function register(Request $request)
-    {
-
-        $admin = Admin::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        event(new Registered($admin));
-
-        return redirect()->route('admin.login')->with('message', 'Registration successful. Please check your email to verify your account before logging in.');
-    }
 
     // Handle admin logout
     public function logout(Request $request)

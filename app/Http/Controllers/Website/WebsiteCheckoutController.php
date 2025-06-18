@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Website;
 
 use Illuminate\Http\Request;
@@ -15,15 +16,20 @@ class WebsiteCheckoutController extends Controller
     public function show()
     {
         $cartItems = session('cart', []);
-        $total = array_sum(array_map(fn($item) => $item['price'] * $item['quantity'], $cartItems));
+
+        $total = array_sum(array_map(fn($item) => $item['price'] * $item['quantity'], $cartItems)); // VAT-inclusive
+        $subtotal = $total / 1.12; // Exclusive of VAT
+        $vat = $total - $subtotal;
+        $grandTotal = $total;
 
         return view('website.checkout', [
             'cartItems' => $cartItems,
-            'total' => $total,
+            'subtotal' => $subtotal,
+            'vat' => $vat,
+            'grandTotal' => $grandTotal,
             'paypalClientId' => config('paypal.client_id'),
         ]);
     }
-
 
     public function complete(Request $request)
     {
@@ -49,7 +55,7 @@ class WebsiteCheckoutController extends Controller
             $order = Order::create([
                 'order_number' => $uniqueOrderNumber,
                 'user_id' => auth()->id(),
-                'total_amount' => $data['totalAmount'],
+                'total_amount' => $data['totalAmount'], // Already VAT-inclusive
                 'order_status' => 'paid',
                 'payment_status' => 'completed',
                 'paypal_order_id' => $data['orderID'],
@@ -57,22 +63,27 @@ class WebsiteCheckoutController extends Controller
                 'shipping_address' => $fullAddress,
             ]);
 
-
             foreach ($data['items'] as $item) {
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $item['id'],
-                    'product_name' => $item['name'],
-                    'quantity' => $item['quantity'],
-                    'unit_price' => $item['price'],
-                ]);
-
                 $product = Product::find($item['id']);
-                if ($product && $product->quantity >= $item['quantity']) {
-                    $product->quantity -= $item['quantity'];
-                    $product->save();
+            
+                if ($product) {
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_id' => $product->id,
+                        'product_name' => $product->name,
+                        'sku' => $product->sku,
+                        'product_image' => $product->image,
+                        'quantity' => $item['quantity'],
+                        'unit_price' => $item['price'],
+                    ]);
+            
+                    if ($product->quantity >= $item['quantity']) {
+                        $product->quantity -= $item['quantity'];
+                        $product->save();
+                    }
                 }
             }
+            
 
             return response()->json(['success' => true]);
         } catch (\Exception $e) {
@@ -80,18 +91,15 @@ class WebsiteCheckoutController extends Controller
         }
     }
 
-
     public function paymentSuccess(Request $request)
     {
         $orderId = $request->query('order_id');
         $order = Order::with('items')->where('paypal_order_id', $orderId)->firstOrFail();
 
-        // Optional: Clear cart
         session()->forget('cart');
 
         $user = $order->user;
 
-        // ✅ Generate and send PDF invoice
         if ($user) {
             $pdf = Pdf::setOptions([
                 'defaultFont' => 'DejaVu Sans'
@@ -102,5 +110,4 @@ class WebsiteCheckoutController extends Controller
 
         return view('website.payment-success', compact('order'));
     }
-
 }

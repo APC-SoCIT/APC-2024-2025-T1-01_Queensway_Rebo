@@ -39,7 +39,7 @@
         border-radius: 20px;
     }
 
-    .category-filter input[type="radio"] {
+    .category-filter input[type="checkbox"] {
         display: none;
     }
 
@@ -53,7 +53,7 @@
         transition: all 0.2s;
     }
 
-    .category-filter input[type="radio"]:checked + label {
+    .category-filter input[type="checkbox"]:checked + label {
         background-color: #007bff;
         color: white;
         border-color: #007bff;
@@ -86,18 +86,22 @@
                                 'Tile Adhesive, Grout & Epoxy',
                                 'Tools, Tile Spacers & Levelers'
                             ];
-                            $selectedCategory = request('category');
+                            $selectedCategories = request()->input('categories', []);
+                            if (!is_array($selectedCategories)) {
+                                $selectedCategories = explode(',', $selectedCategories);
+                            }
                         @endphp
 
                         @foreach ($categories as $category)
                             <div>
-                                <input type="radio" name="category" id="cat-{{ Str::slug($category) }}" value="{{ $category }}"
-                                    {{ $selectedCategory === $category ? 'checked' : '' }}>
+                                <input type="checkbox" name="categories[]" id="cat-{{ Str::slug($category) }}" value="{{ $category }}"
+                                    {{ in_array($category, $selectedCategories) ? 'checked' : '' }}>
                                 <label for="cat-{{ Str::slug($category) }}">{{ $category }}</label>
                             </div>
                         @endforeach
 
                         <button type="submit" class="btn btn-outline-primary btn-sm mt-3 w-100">Apply Filter</button>
+                        <button type="button" id="clear-filters" class="btn btn-outline-danger btn-sm mt-2 w-100">Remove Filter</button>
                     </form>
                 </div>
             </div>
@@ -179,6 +183,7 @@
         showLoading();
         const url = new URL(window.location.href);
         url.searchParams.set('sort', this.value);
+        url.searchParams.delete('page');
         window.location.href = url.toString();
     });
 
@@ -186,16 +191,40 @@
     document.getElementById('category-filter-form').addEventListener('submit', function (e) {
         e.preventDefault();
         showLoading();
-        const selectedCategory = document.querySelector('input[name="category"]:checked')?.value || '';
+
         const url = new URL(window.location.href);
-        url.searchParams.set('category', selectedCategory);
+        url.searchParams.delete('page');
+        url.searchParams.delete('categories[]');
+
+        // Clear existing category params
+        for (const key of [...url.searchParams.keys()]) {
+            if (key.startsWith("categories")) {
+                url.searchParams.delete(key);
+            }
+        }
+
+        // Add new checked categories
+        const selected = document.querySelectorAll('input[name="categories[]"]:checked');
+        selected.forEach(el => {
+            url.searchParams.append('categories[]', el.value);
+        });
+
         window.location.href = url.toString();
     });
 
-    // View Details buttons click
+    // Clear filters
+    document.getElementById('clear-filters').addEventListener('click', function () {
+        showLoading();
+        const url = new URL(window.location.href);
+        url.searchParams.delete('categories[]');
+        url.searchParams.delete('page');
+        window.location.href = url.toString();
+    });
+
+    // View Details buttons
     document.querySelectorAll('.btn-primary').forEach(btn => {
         if (btn.textContent.trim() === 'View Details') {
-            btn.addEventListener('click', function(e) {
+            btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 showLoading();
                 const href = this.href;

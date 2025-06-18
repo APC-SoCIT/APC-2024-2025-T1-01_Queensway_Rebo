@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminFaqBotController;
 use App\Http\Controllers\User\UserController;
 use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\Admin\AdminDashboardController;
@@ -22,10 +23,12 @@ use App\Http\Controllers\User\ForgotPasswordController;
 use App\Http\Controllers\User\ResetPasswordController;
 use App\Http\Controllers\Admin\AdminForgotPasswordController;
 use App\Http\Controllers\Admin\AdminResetPasswordController;
+use App\Http\Controllers\Admin\AdminManagementController;
+
 
 
 // Public Routes
-Route::get('/', [WebsiteProductController::class, 'landingPage']);
+Route::get('/', [WebsiteProductController::class, 'landingPage'])->name('home');
 
 // Product Pages
 Route::get('product/{id}', [WebsiteProductController::class, 'show'])->name('product.show');
@@ -83,6 +86,19 @@ Route::prefix('admin')->middleware('auth:admin')->group(function () {
     Route::get('orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
     Route::post('orders/{order}/mark-shipped', [AdminOrderController::class, 'markShipped'])->name('admin.orders.markShipped');
     Route::post('orders/{order}/mark-preparing', [AdminOrderController::class, 'markedPreparing'])->name('admin.orders.markPreparing');
+
+    Route::resource('faqs', AdminFaqBotController::class)->names('admin.faqs');
+
+    Route::prefix('admin-management')->name('admin.admin_management.')->group(function () {
+        Route::get('/', [AdminManagementController::class, 'index'])->name('index');
+        Route::get('/create', [AdminManagementController::class, 'create'])->name('create');
+        Route::post('/', [AdminManagementController::class, 'store'])->name('store'); // Cleaner than '/store'
+        Route::delete('/{admin}', [AdminManagementController::class, 'destroy'])->name('destroy');
+    });
+
+    Route::get('/account-info', [AdminController::class, 'accountInfo'])->name('admin.account-info');
+    Route::put('/update-password', [AdminController::class, 'updatePassword'])->name('admin.update-password');
+    
 });
 
 
@@ -180,6 +196,12 @@ Route::get('/tile-calculator', function () {
 Route::get('/installation-videos', function () {
     return view('website.installation-videos');
 })->name('installation.videos');
+
+
+
+
+Route::post('/faq-bot', [WebsiteFaqBotController::class, 'handle'])->name('faq.bot');
+
 
 
 

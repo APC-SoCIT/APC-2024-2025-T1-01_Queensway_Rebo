@@ -38,17 +38,13 @@ class AuthController extends Controller
             }
 
             $request->session()->regenerate();
-            return redirect()->route('user.dashboard');
-
+            return redirect()->route('home');
         }
 
         return back()->withErrors([
             'email' => 'Invalid credentials.',
         ])->withInput($request->only('email'));
     }
-
-
-
 
     // User registration form
     public function showRegistrationForm()
@@ -59,16 +55,23 @@ class AuthController extends Controller
     // Handle user registration
     public function register(Request $request)
     {
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name'  => 'required|string|max:255',
+            'email'      => 'required|email|unique:users,email',
+            'password'   => 'required|min:8|confirmed',
+        ]);
+
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'first_name' => $request->first_name,
+            'last_name'  => $request->last_name,
+            'email'      => $request->email,
+            'password'   => Hash::make($request->password),
         ]);
 
         event(new Registered($user));
 
         return redirect()->route('login')->with('message', 'Registration successful. Please check your email to verify your account before logging in.');
-
     }
 
     // Handle logout
@@ -80,6 +83,4 @@ class AuthController extends Controller
 
         return redirect('/');
     }
-
-
 }

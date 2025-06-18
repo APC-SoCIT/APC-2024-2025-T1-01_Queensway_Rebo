@@ -18,15 +18,19 @@ class WebsiteProductController extends Controller
     public function products(Request $request)
     {
         $sort = $request->query('sort', 'latest');
-        $category = $request->query('category'); // <-- get category filter from query string
-
-        $query = Product::query();
-
-        // Apply category filter
-        if ($category) {
-            $query->where('category', $category);
+        $categories = $request->query('categories');
+    
+        if ($categories) {
+            $categories = is_array($categories) ? $categories : explode(',', $categories);
         }
-
+    
+        $query = Product::query();
+    
+        // Apply multiple category filters
+        if (!empty($categories)) {
+            $query->whereIn('category', $categories);
+        }
+    
         // Apply sorting
         if ($sort === 'price_asc') {
             $query->orderBy('price', 'asc');
@@ -35,19 +39,32 @@ class WebsiteProductController extends Controller
         } else {
             $query->latest();
         }
-
-        $products = $query->paginate(10)->appends($request->query()); // keep filters in pagination links
-
-        return view('website.products', compact('products', 'sort', 'category'));
+    
+        $products = $query->paginate(10)->appends($request->query());
+    
+        return view('website.products', [
+            'products' => $products,
+            'sort' => $sort,
+            'category' => null,
+            'selectedCategories' => $categories ?? [],
+        ]);
     }
-
+    
+    
 
     // Single product detail page
     public function show($id)
     {
         $product = Product::findOrFail($id);
-        return view('website.product-detail', compact('product'));
+    
+        $relatedProducts = Product::where('category', $product->category)
+            ->where('id', '!=', $product->id)
+            ->take(4)
+            ->get();
+    
+        return view('website.product-detail', compact('product', 'relatedProducts'));
     }
+    
 
 
 }

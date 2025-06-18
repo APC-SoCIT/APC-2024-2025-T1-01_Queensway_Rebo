@@ -1,24 +1,34 @@
 <?php
 
-
 namespace App\Http\Controllers\Admin;
 
-use App\Models\User;
-use App\Models\Order;
-use App\Models\Product;
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
-    // public function dashboard()
-    // {
-    //     // Fetch the data for the dashboard
-    //     $totalUsers = User::count();
-    //     $totalRevenue = Order::where('order_status', 'paid')->sum('total_amount');
-    //     $pendingOrders = Order::where('order_status', 'pending')->count();
-    //     $totalProducts = Product::count();
+    public function accountInfo()
+    {
+        return view('admin.account-info');
+    }
 
-    //     // Pass the data to the view
-    //     return view('admin.dashboard', compact('totalUsers', 'totalRevenue', 'pendingOrders', 'totalProducts'));
-    // }
+    public function updatePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|min:8|confirmed',
+        ]);
+
+        if (!Hash::check($request->current_password, Auth::guard('admin')->user()->password)) {
+            return back()->withErrors(['current_password' => 'Current password is incorrect']);
+        }
+
+        Auth::guard('admin')->user()->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        return back()->with('message', 'Password updated successfully.');
+    }
 }

@@ -23,7 +23,7 @@ class AdminResetPasswordController extends Controller
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|confirmed',
+            'password' => 'required|min:8|confirmed',
         ]);
 
         $status = Password::broker('admins')->reset(

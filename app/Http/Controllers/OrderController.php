@@ -4,38 +4,33 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    // OrderController.php
+    // Show order details in user view
     public function show(Order $order)
     {
-        // Fetch order items related to this order, with their products
-        $orderItems = OrderItem::where('order_id', $order->id)
-                               ->with('product')
-                               ->get();
-    
+        $orderItems = OrderItem::where('order_id', $order->id)->get();
+
+
         return view('user.order-details', [
             'order' => $order,
             'orderItems' => $orderItems,
         ]);
     }
 
-
+    // Generate and stream invoice PDF
     public function viewInvoice(Order $order)
     {
+        $order->load('items.product'); // eager load for performance
+
         $pdf = Pdf::setOptions([
             'isRemoteEnabled' => true,
             'defaultFont' => 'DejaVu Sans',
         ])->loadView('pdf.invoice', compact('order'));
 
-
-        return $pdf->stream("invoice-{$order->id}.pdf");
+        return $pdf->stream("invoice-{$order->order_number}.pdf");
     }
-
-
 }

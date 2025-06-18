@@ -85,17 +85,6 @@
                     @foreach($errors->all() as $error)
                         <div>{{ $error }}</div>
                     @endforeach
-
-                    @if (session('showResend'))
-                        <form method="POST" action="{{ route('admin.verification.send') }}" onsubmit="showResendSpinner(this)">
-                            @csrf
-                            <input type="hidden" name="email" value="{{ old('email') }}">
-                            <button type="submit" class="btn btn-link p-0" id="resend-btn">
-                                <span class="spinner-border spinner-border-sm d-none" role="status" id="resend-spinner"></span>
-                                <span id="resend-text">Resend Verification Email</span>
-                            </button>
-                        </form>
-                    @endif
                 </div>
             @endif
 
@@ -118,7 +107,6 @@
                         <label class="form-check-label" for="remember">Remember Me</label>
                     </div>
                     <a href="{{ route('admin.password.request') }}" class="small text-decoration-none">Forgot Password?</a>
-
                 </div>
 
                 <button type="submit" id="login-btn" class="btn btn-primary w-100">
@@ -127,12 +115,7 @@
                 </button>
             </form>
 
-            <p class="mt-4 text-center small">
-                Don’t have an admin account?
-                <a href="{{ route('admin.register') }}" class="text-decoration-none">Register here</a>
-            </p>
-
-            <div class="link-container">
+            <div class="link-container mt-4">
                 <a href="{{ url('/') }}" class="btn btn-link text-primary">Return to Website</a> |
                 <a href="{{ route('login') }}" class="btn btn-link text-primary">Login as User</a>
             </div>
@@ -149,15 +132,6 @@
         btn.disabled = true;
         spinner.classList.remove('d-none');
         text.textContent = 'Logging in...';
-    }
-
-    function showResendSpinner(form) {
-        const spinner = document.getElementById('resend-spinner');
-        const text = document.getElementById('resend-text');
-        const btn = document.getElementById('resend-btn');
-        btn.disabled = true;
-        spinner.classList.remove('d-none');
-        text.textContent = 'Sending...';
     }
 </script>
 @endsection
