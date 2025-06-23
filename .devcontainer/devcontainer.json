@@ -1,19 +1,33 @@
 {
-  "name": "Laravel + MySQL Dev",
-  "dockerComposeFile": "docker-compose.yml",
-  "service": "app",
-  "workspaceFolder": "/var/www",
-  "postCreateCommand": "chmod +x .devcontainer/init-db.sh && .devcontainer/init-db.sh && composer install && php artisan key:generate",
-  "remoteUser": "vscode",
+  "name": "Laravel + MariaDB Development Environment",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "postCreateCommand": [
+    "cp .env.example .env",                // Copy .env.example to .env
+    "composer install",                    // Install PHP dependencies via Composer
+    "php artisan key:generate",            // Generate Laravel application key
+    "php artisan migrate --force",         // Optionally, run migrations (if needed)
+    "sh /workspace/.devcontainer/init-db.sh" // Run script to import SQL dump if available
+  ],
   "customizations": {
     "vscode": {
       "extensions": [
-        "xdebug.php-debug",
-        "bmewburn.vscode-intelephense-client"
+        "bmewburn.vscode-intelephense-client", // PHP language support
+        "xdebug.php-debug"                   // Xdebug extension for debugging
       ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/mariadb:2": {
+      "version": "10.6",
+      "database": "ecommerce",
+      "user": "root",
+      "password": "root"
     }
   },
   "mounts": [
     "source=${localWorkspaceFolder}/ecommerce.sql,target=/workspace/ecommerce.sql,type=bind,consistency=cached"
-  ]
+  ],
+  "remoteUser": "vscode"
 }

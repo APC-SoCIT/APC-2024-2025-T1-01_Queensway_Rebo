@@ -1,11 +1,22 @@
-FROM php:8.2-cli
+# Use the official PHP 8.2 image with FPM
+FROM php:8.2-fpm
 
-# Install dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git zip unzip libzip-dev libonig-dev libpng-dev libcurl4-openssl-dev pkg-config libssl-dev mysql-client \
-    && docker-php-ext-install pdo_mysql zip mbstring
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    zip \
+    git \
+    libmysqlclient-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install gd pdo pdo_mysql
 
 # Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-WORKDIR /workspace
+# Set the working directory inside the container
+WORKDIR /var/www
+
+# Expose port 8000 for Laravel
+EXPOSE 8000

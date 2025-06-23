@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   app:
-    image: php:8.1-fpm
+    image: php:8.2-fpm
     container_name: laravel-app
     working_dir: /var/www
     volumes:
@@ -10,7 +10,7 @@ services:
     networks:
       - laravel
     ports:
-      - "8000:8000"  # Port mapping: host:container
+      - "8000:8000"
     depends_on:
       - db
 
@@ -33,3 +33,4 @@ networks:
 
 volumes:
   mysql_data:
+    name: devcontainer_mysql_data

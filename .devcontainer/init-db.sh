@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Wait for MariaDB to be ready
-until mysqladmin ping -h "db" --silent; do
+until mysqladmin ping -h "localhost" --silent; do
   echo "Waiting for MariaDB to be ready..."
   sleep 2
 done
