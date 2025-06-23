@@ -1,28 +1,31 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  app:
+  laravel:
     build:
       context: .
-      dockerfile: .devcontainer/Dockerfile
+      dockerfile: Dockerfile
     volumes:
-      - .:/var/www/html
+      - .:/workspace:cached
     ports:
-      - "8000:8000"
+      - 8000:8000
     depends_on:
       - db
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ecommerce
+      DB_USERNAME: root
+      DB_PASSWORD: root
 
   db:
     image: mysql:8.0
-    restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: ecommerce
-    ports:
-      - "3306:3306"
     volumes:
-      - db-data:/var/lib/mysql
-      - ./ecommerce.sql:/docker-entrypoint-initdb.d/ecommerce.sql
+      - db_data:/var/lib/mysql
+      - ./ecommerce.sql:/docker-entrypoint-initdb.d/ecommerce.sql:ro
 
 volumes:
-  db-data:
+  db_data:
