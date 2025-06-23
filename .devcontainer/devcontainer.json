@@ -1,5 +1,5 @@
 {
-  "name": "Laravel Dev with MariaDB",
+  "name": "Laravel with MariaDB",
   "build": {
     "dockerfile": "Dockerfile"
   },
@@ -8,8 +8,8 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "xdebug.php-debug",
-        "bmewburn.vscode-intelephense-client"
+        "bmewburn.vscode-intelephense-client",
+        "xdebug.php-debug"
       ]
     }
   },
