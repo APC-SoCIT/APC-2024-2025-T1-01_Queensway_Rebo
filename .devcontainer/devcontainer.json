@@ -1,16 +1,19 @@
 {
-  "name": "Laravel + MySQL",
+  "name": "Laravel + MySQL Dev",
   "dockerComposeFile": "docker-compose.yml",
-  "service": "laravel",
-  "workspaceFolder": "/workspace",
-  "forwardPorts": [8000],
-  "postCreateCommand": "cp .env.example .env && composer install && php artisan key:generate && ./init-db.sh",
+  "service": "app",
+  "workspaceFolder": "/var/www",
+  "postCreateCommand": "chmod +x .devcontainer/init-db.sh && .devcontainer/init-db.sh && composer install && php artisan key:generate",
+  "remoteUser": "vscode",
   "customizations": {
     "vscode": {
       "extensions": [
-        "bmewburn.vscode-intelephense-client",
-        "xdebug.php-debug"
+        "xdebug.php-debug",
+        "bmewburn.vscode-intelephense-client"
       ]
     }
-  }
+  },
+  "mounts": [
+    "source=${localWorkspaceFolder}/ecommerce.sql,target=/workspace/ecommerce.sql,type=bind,consistency=cached"
+  ]
 }

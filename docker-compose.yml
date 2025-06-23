@@ -1,31 +1,35 @@
-version: "3.8"
+version: '3.8'
 
 services:
-  laravel:
-    build:
-      context: .
-      dockerfile: Dockerfile
+  app:
+    image: php:8.1-fpm
+    container_name: laravel-app
+    working_dir: /var/www
     volumes:
-      - .:/workspace:cached
+      - .:/var/www
+    networks:
+      - laravel
     ports:
-      - 8000:8000
+      - "8000:8000"  # Port mapping: host:container
     depends_on:
       - db
-    environment:
-      DB_HOST: db
-      DB_PORT: 3306
-      DB_DATABASE: ecommerce
-      DB_USERNAME: root
-      DB_PASSWORD: root
 
   db:
-    image: mysql:8.0
+    image: mysql:5.7
+    container_name: mysql-db
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: ecommerce
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
     volumes:
-      - db_data:/var/lib/mysql
-      - ./ecommerce.sql:/docker-entrypoint-initdb.d/ecommerce.sql:ro
+      - mysql_data:/var/lib/mysql
+    networks:
+      - laravel
+
+networks:
+  laravel:
+    driver: bridge
 
 volumes:
-  db_data:
+  mysql_data:
