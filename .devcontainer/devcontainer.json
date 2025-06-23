@@ -1,0 +1,16 @@
+{
+  "name": "Laravel Codespace",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "laravel",
+  "workspaceFolder": "/workspace",
+  "postCreateCommand": "cp .env.example .env && composer install && php artisan key:generate && php artisan migrate --seed",
+  "forwardPorts": [8000],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "xdebug.php-debug"
+      ]
+    }
+  }
+}

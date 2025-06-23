@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  laravel:
+    image: laravelsail/php82-composer
+    container_name: laravel
+    ports:
+      - "8000:8000"
+    volumes:
+      - ..:/workspace:cached
+    working_dir: /workspace
+    depends_on:
+      - mysql
+    command: /bin/sh -c "while sleep 1000; do :; done"
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: laravel
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
