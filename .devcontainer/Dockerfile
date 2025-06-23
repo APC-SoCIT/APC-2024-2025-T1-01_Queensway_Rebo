@@ -1,14 +1,13 @@
-# .devcontainer/Dockerfile
 FROM php:8.2-apache
 
-# Install system dependencies
+# Install dependencies
 RUN apt-get update && apt-get install -y \
-    git \
+    libzip-dev \
     zip \
     unzip \
     curl \
+    git \
     libonig-dev \
-    libzip-dev \
     mariadb-client \
     && docker-php-ext-install pdo_mysql mbstring zip \
     && a2enmod rewrite
@@ -16,5 +15,4 @@ RUN apt-get update && apt-get install -y \
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
 WORKDIR /var/www/html
