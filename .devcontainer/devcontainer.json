@@ -1,15 +1,16 @@
 {
-  "name": "Laravel Codespace",
-  "dockerComposeFile": "docker-compose.yml",
-  "service": "laravel",
-  "workspaceFolder": "/workspace",
-  "postCreateCommand": "cp .env.example .env && composer install && php artisan key:generate && php artisan migrate --seed",
+  "name": "Laravel Dev",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
   "forwardPorts": [8000],
+  "postCreateCommand": "cp .env.example .env && composer install && php artisan key:generate && npm install && npm run build",
   "customizations": {
     "vscode": {
       "extensions": [
+        "xdebug.php-debug",
         "bmewburn.vscode-intelephense-client",
-        "xdebug.php-debug"
+        "esbenp.prettier-vscode"
       ]
     }
   }
