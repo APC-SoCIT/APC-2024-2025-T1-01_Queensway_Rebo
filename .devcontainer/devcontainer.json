@@ -1,9 +1,9 @@
 {
-  "name": "Laravel Dev",
+  "name": "Laravel Dev with MariaDB",
   "build": {
     "dockerfile": "Dockerfile"
   },
-  "forwardPorts": [8000],
+  "forwardPorts": [8000, 3306],
   "postCreateCommand": "cp .env.example .env && composer install && php artisan key:generate",
   "customizations": {
     "vscode": {
@@ -12,5 +12,6 @@
         "bmewburn.vscode-intelephense-client"
       ]
     }
-  }
+  },
+  "remoteUser": "www-data"
 }
