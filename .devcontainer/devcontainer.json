@@ -1,7 +1,7 @@
 {
   "name": "Laravel + MariaDB Development Environment",
   "build": {
-    "dockerfile": "Dockerfile"
+    "dockerfile": "../Dockerfile"  // Point to the Dockerfile outside the `.devcontainer` folder
   },
   "postCreateCommand": [
     "cp .env.example .env",                // Copy .env.example to .env
