@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     image: laravelphp/php-fpm
@@ -10,14 +8,14 @@ services:
     volumes:
       - .:/var/www
     networks:
-      - laravel
+      - apc-2024-2025-t1-01_queensway_rebo_laravel
     ports:
       - "8000:8000"
     environment:
       - PHP_FPM_INSTALL_XDEBUG=true
     depends_on:
       - mysql
-    command: bash -c "composer install && php artisan key:generate && php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000"
+    command: bash -c "sleep 10 && php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000"  # Added a sleep to wait for MySQL
 
   mysql:
     image: mysql:5.7
@@ -25,19 +23,24 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: rootpassword
       MYSQL_DATABASE: ecommerce
-      MYSQL_USER: root
-      MYSQL_PASSWORD: rootpassword
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./scripts/import_db.sh:/docker-entrypoint-initdb.d/import_db.sh  # Import script executed on first MySQL start
+      - ./scripts/import_db.sh:/docker-entrypoint-initdb.d/import_db.sh
+      - ./scripts/ecommerce.sql:/docker-entrypoint-initdb.d/ecommerce.sql  # Mount the database dump
     networks:
-      - laravel
+      - apc-2024-2025-t1-01_queensway_rebo_laravel
     ports:
       - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--host=localhost", "--user=root", "--password=rootpassword"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
 volumes:
   mysql_data:
 
 networks:
-  laravel:
+  apc-2024-2025-t1-01_queensway_rebo_laravel:
     driver: bridge
