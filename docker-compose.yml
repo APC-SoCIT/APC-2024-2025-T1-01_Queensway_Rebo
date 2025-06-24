@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  app:
+    image: laravelphp/php-fpm
+    container_name: laravel-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www
+    networks:
+      - laravel
+    ports:
+      - "8000:8000"
+    environment:
+      - PHP_FPM_INSTALL_XDEBUG=true
+    depends_on:
+      - mysql
+    command: bash -c "composer install && php artisan key:generate && php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000"
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ecommerce
+      MYSQL_USER: root
+      MYSQL_PASSWORD: rootpassword
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./scripts/import_db.sh:/docker-entrypoint-initdb.d/import_db.sh  # Import script executed on first MySQL start
+    networks:
+      - laravel
+    ports:
+      - "3306:3306"
+
+volumes:
+  mysql_data:
+
+networks:
+  laravel:
+    driver: bridge
