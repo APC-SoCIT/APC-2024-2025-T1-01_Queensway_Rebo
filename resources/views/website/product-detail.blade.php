@@ -107,6 +107,82 @@
             </div>
         </div>
 
+        <!-- 🔹 Tile Calculator Section -->
+        <div class="related-section mt-5 shadow-sm">
+            <h2 class="related-title text-center">🧮 Tile Calculator</h2>
+
+            <p class="text-muted text-center">
+                Calculate how many tiles you’ll need for your room based on dimensions.
+            </p>
+
+            <form id="tile-calculator" onsubmit="return false;" class="p-3">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="room_length" class="form-label">Room Length (meters)</label>
+                        <input type="number" step="0.01" id="room_length" class="form-control" placeholder="e.g. 5"
+                            required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="room_width" class="form-label">Room Width (meters)</label>
+                        <input type="number" step="0.01" id="room_width" class="form-control" placeholder="e.g. 4" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="tile_length" class="form-label">Tile Length (cm)</label>
+                        <input type="number" step="0.1" id="tile_length" class="form-control"
+                            value="{{ $product->length ?? '' }}" placeholder="e.g. 30" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="tile_width" class="form-label">Tile Width (cm)</label>
+                        <input type="number" step="0.1" id="tile_width" class="form-control"
+                            value="{{ $product->width ?? '' }}" placeholder="e.g. 30" required>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary mt-3 w-100" onclick="calculateTiles()">Calculate</button>
+            </form>
+
+            <div class="mt-4 text-center" id="tile-result" style="display:none;">
+                <h4>Estimated Tiles Needed: <span id="tiles-needed"></span></h4>
+                <p><small>(Including 10% wastage)</small></p>
+
+                <!-- Quick Add to Cart -->
+                @if($product->quantity > 0)
+                    <form id="tile-cart-form" action="{{ route('cart.add') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="hidden" name="quantity" id="calculated-quantity">
+                        @auth
+                            <button type="submit" class="btn btn-success mt-2">Add to Cart with Calculated Quantity</button>
+                        @else
+                            <button type="button" class="btn btn-secondary" disabled
+                                title="Please log in to add items to your cart">
+                               Add to Cart with Calculated Quantity (Login Required)
+                            </button>
+                        @endauth
+                    </form>
+                @endif
+            </div>
+        </div>
+
+        <!-- Tutorial Videos -->
+        @if(!empty($tutorialVideos))
+            <div class="related-section mt-5 shadow-sm">
+                <h2 class="related-title text-center">Tutorial Videos</h2>
+                <div class="row row-cols-1 row-cols-md-2 g-4">
+                    @foreach($tutorialVideos as $video)
+                        <div class="col">
+                            <div class="card related-card h-100 p-2">
+                                <video class="w-100 rounded" controls>
+                                    <source src="{{ asset('storage/videos/' . rawurlencode($video)) }}" type="video/mp4">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <p class="mt-2 text-center fw-semibold">{{ pathinfo($video, PATHINFO_FILENAME) }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
         <!-- Related Products -->
         @if(isset($relatedProducts) && $relatedProducts->count())
             <div class="related-section mt-5 shadow-sm">
@@ -141,5 +217,28 @@
         document.getElementById('add-to-cart-form')?.addEventListener('submit', function () {
             document.getElementById('view-loading').classList.add('active');
         });
+
+        function calculateTiles() {
+            const roomLength = parseFloat(document.getElementById('room_length').value);
+            const roomWidth = parseFloat(document.getElementById('room_width').value);
+            const tileLengthCm = parseFloat(document.getElementById('tile_length').value);
+            const tileWidthCm = parseFloat(document.getElementById('tile_width').value);
+
+            if (roomLength <= 0 || roomWidth <= 0 || tileLengthCm <= 0 || tileWidthCm <= 0) {
+                alert('Please enter positive numbers for all fields.');
+                return;
+            }
+
+            const tileLengthM = tileLengthCm / 100;
+            const tileWidthM = tileWidthCm / 100;
+            const roomArea = roomLength * roomWidth;
+            const tileArea = tileLengthM * tileWidthM;
+            const tilesNeeded = roomArea / tileArea;
+            const tilesWithWastage = Math.ceil(tilesNeeded * 1.1);
+
+            document.getElementById('tiles-needed').textContent = tilesWithWastage;
+            document.getElementById('tile-result').style.display = 'block';
+            document.getElementById('calculated-quantity').value = tilesWithWastage;
+        }
     </script>
 @endsection

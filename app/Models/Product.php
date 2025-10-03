@@ -15,7 +15,12 @@ class Product extends Model
         'quantity',
         'date_created',
         'category',
-        'sku', // Make sure this is fillable
+        'sku',
+        'embedding'
+    ];
+
+    protected $casts = [
+        'embedding' => 'array', // JSON → PHP array
     ];
 
     protected static function booted()

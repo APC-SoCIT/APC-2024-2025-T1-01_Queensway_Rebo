@@ -53,18 +53,40 @@ class WebsiteProductController extends Controller
     
 
     // Single product detail page
-    public function show($id)
-    {
-        $product = Product::findOrFail($id);
-    
-        $relatedProducts = Product::where('category', $product->category)
-            ->where('id', '!=', $product->id)
-            ->take(4)
-            ->get();
-    
-        return view('website.product-detail', compact('product', 'relatedProducts'));
-    }
-    
+public function show($id)
+{
+    $product = Product::findOrFail($id);
+
+    $relatedProducts = Product::where('category', $product->category)
+        ->where('id', '!=', $product->id)
+        ->take(4)
+        ->get();
+
+    // Map categories to tutorial videos
+    $videoMap = [
+        'Tiles' => [
+            'Tiles/QUEENSWAY Vinyl Tiles Installation.mp4',
+        ],
+        'WPC Panels & Wall Cladding' => [
+            'WPC Panels & Wall Cladding/QUEENSWAY WPC Flutted Wall Panel Installation.mp4',
+            'WPC Panels & Wall Cladding/QUEENSWAY Parametric Wall Cladding Installation.mp4',
+            'WPC Panels & Wall Cladding/QUEENSWAY PVC Laminate Ceiling Panel Installation.mp4'
+        ],
+        'Vinyl' => [
+           'Vinyl/QUEENSWAY Vinyl Tiles Installation.mp4',
+        ],
+        'Borders' => [],
+        'Mosaics' => [],
+        'Sanitary Wares' => [],
+        'Tile Adhesive, Grout & Epoxy' => [],
+        'Tools, Tile Spacers & Levelers' => [],
+    ];
+
+    $tutorialVideos = $videoMap[$product->category] ?? [];
+
+    return view('website.product-detail', compact('product', 'relatedProducts', 'tutorialVideos'));
+}
+
 
 
 }

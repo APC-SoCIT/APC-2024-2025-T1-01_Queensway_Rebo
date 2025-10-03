@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\AdminAuthController;
 use App\Http\Controllers\Website\WebsiteFaqBotController;
 use App\Http\Controllers\Website\WebsiteProductController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Website\WebsiteSearchController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Website\WebsiteCartController;
@@ -206,4 +207,12 @@ Route::post('/faq-bot', [WebsiteFaqBotController::class, 'handle'])->name('faq.b
 
 
 
+
+Route::get('/', [WebsiteSearchController::class, 'index'])->name('home');
+
+// Text search
+Route::post('/search/text', [WebsiteSearchController::class, 'searchText'])->name('search.text');
+
+// Image search
+Route::post('/search/image', [WebsiteSearchController::class, 'searchImage'])->name('search.image');
 

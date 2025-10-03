@@ -1,8 +1,13 @@
+# Ignore everything in public/
+public/*
+# But don't ignore /public/storage/
+!/public/storage/
+
+# Other general patterns
 /.phpunit.cache
 /node_modules
 /public/build
 /public/hot
-/public/storage
 /storage/*.key
 /storage/pail
 /vendor
