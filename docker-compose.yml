@@ -1,21 +1,21 @@
+version: "3.9"
+
 services:
   app:
-    image: laravelphp/php-fpm
-    container_name: laravel-app
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: laravel-app
+    working_dir: /var/www
     volumes:
-      - .:/var/www
-    networks:
-      - apc-2024-2025-t1-01_queensway_rebo_laravel
+      - ./:/var/www
     ports:
       - "8000:8000"
-    environment:
-      - PHP_FPM_INSTALL_XDEBUG=true
     depends_on:
       - mysql
-    command: bash -c "sleep 10 && php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000"  # Added a sleep to wait for MySQL
+    command: bash -c "sleep 15 && composer install && php artisan key:generate && php artisan migrate && php artisan serve --host=0.0.0.0 --port=8000"
+    networks:
+      - laravel-network
 
   mysql:
     image: mysql:5.7
@@ -26,9 +26,9 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./scripts/import_db.sh:/docker-entrypoint-initdb.d/import_db.sh
-      - ./scripts/ecommerce.sql:/docker-entrypoint-initdb.d/ecommerce.sql  # Mount the database dump
-    networks:
-      - apc-2024-2025-t1-01_queensway_rebo_laravel
+      - ./scripts/ecommerce.sql:/docker-entrypoint-initdb.d/ecommerce.sql
+      - ./storage:/var/www/storage
+
     ports:
       - "3306:3306"
     healthcheck:
@@ -37,10 +37,13 @@ services:
       retries: 5
       start_period: 30s
       timeout: 10s
+    networks:
+      - laravel-network
 
 volumes:
   mysql_data:
 
 networks:
-  apc-2024-2025-t1-01_queensway_rebo_laravel:
+  laravel-network:
     driver: bridge
+
