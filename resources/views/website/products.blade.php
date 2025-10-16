@@ -1,90 +1,223 @@
 @extends('layouts.website')
 
 @section('content')
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
 <style>
-    .product-card img {
-        width: 100%;
-        height: 200px;
-        object-fit: cover;
-    }
+   :root {
+  --primary: #004b8d;
+  --accent: #f4b400;
+  --bg-light: #f8faff;
+  --white: #ffffff;
+  --gray: #6c757d;
+  --text-dark: #1c1c1c;
+  --card-shadow: rgba(0, 0, 0, 0.08);
+}
 
-    .product-card {
-        transition: all 0.3s ease-in-out;
-        padding: 15px;
-        border: 1px solid #e0e0e0;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        background-color: #fff;
-    }
+/* Background */
+body {
+  background: linear-gradient(180deg, #eef4f9 0%, #f8faff 100%);
+  font-family: 'Poppins', 'Inter', sans-serif;
+}
 
-    .product-card:hover {
-        transform: scale(1.03);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
+/* Filter Card Container */
+.filter-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  position: sticky;
+  top: 1rem;
+}
 
-    .card-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
+/* Card Header */
+.filter-card .card-header {
+  background: linear-gradient(90deg, #0044ff, #007bff);
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 0.9rem;
+  border: none;
+  letter-spacing: 0.3px;
+}
 
-    .card-text {
-        font-size: 0.9rem;
-        color: #666;
-    }
+/* Card Body */
+.category-filter {
+  padding: 1.25rem 1.5rem;
+  background-color: #f8fafc;
+}
 
-    .btn-primary {
-        font-size: 0.85rem;
-        padding: 6px 14px;
-        border-radius: 20px;
-    }
+/* Checkbox Container */
+.category-filter div {
+  display: flex;
+  align-items: center;
+  padding: 0.45rem 0.75rem;
+  border-radius: 10px;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
 
-    .category-filter input[type="checkbox"] {
-        display: none;
-    }
+/* Hover & Active Effect */
+.category-filter div:hover {
+  background-color: #e9f1ff;
+}
 
-    .category-filter label {
-        display: block;
-        padding: 10px 15px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        cursor: pointer;
-        margin-bottom: 8px;
-        transition: all 0.2s;
-    }
+.category-filter input[type="checkbox"] {
+  accent-color: #0044ff;
+  margin-right: 0.6rem;
+  width: 18px;
+  height: 18px;
+}
 
-    .category-filter input[type="checkbox"]:checked + label {
-        background-color: #007bff;
-        color: white;
-        border-color: #007bff;
-    }
+/* Label Text */
+.category-filter label {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #1e293b;
+  cursor: pointer;
+}
 
-    .sort-select {
-        max-width: 200px;
-        font-size: 0.9rem;
-    }
+/* Buttons */
+#category-filter-form .btn {
+  font-weight: 600;
+  border-radius: 12px;
+  transition: all 0.25s ease;
+}
+
+#category-filter-form .btn-outline-primary {
+  border: 2px solid #0044ff;
+}
+
+#category-filter-form .btn-outline-primary:hover {
+  background: #0044ff;
+  color: #fff;
+}
+
+#category-filter-form .btn-outline-danger {
+  border: 2px solid #dc2626;
+}
+
+#category-filter-form .btn-outline-danger:hover {
+  background: #dc2626;
+  color: #fff;
+}
+
+
+/* --- PRODUCT SECTION --- */
+.shop-products {
+  padding: 70px 0;
+}
+
+.product-card {
+  background: var(--white);
+  border-radius: 18px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07);
+  transition: all 0.35s ease;
+  overflow: hidden;
+  height: 100%;
+}
+
+.product-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
+}
+
+.product-card img {
+  height: 250px;
+  width: 100%;
+  object-fit: cover;
+  border-bottom: 3px solid var(--accent);
+}
+
+.product-card .card-body {
+  text-align: center;
+  padding: 22px 16px;
+}
+
+.product-card h5 {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+}
+
+.product-card p {
+  color: var(--gray);
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+}
+
+.product-card .btn {
+  background: var(--accent);
+  color: #222;
+  border-radius: 25px;
+  padding: 8px 20px;
+  font-weight: 600;
+  border: none;
+  box-shadow: 0 3px 10px rgba(244, 180, 0, 0.3);
+  transition: 0.3s ease;
+}
+
+.product-card .btn:hover {
+  background: #ffca28;
+  transform: translateY(-2px);
+}
+
+/* --- HEADER & SORT --- */
+.sort-select {
+  max-width: 220px;
+  font-size: 0.9rem;
+  border-radius: 10px;
+  border: 1.5px solid var(--primary);
+}
+
+.sort-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 6px rgba(0, 75, 141, 0.3);
+}
+
+/* --- PAGINATION --- */
+.pagination-container .page-link {
+  color: var(--primary);
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.pagination-container .page-item.active .page-link {
+  background-color: var(--accent);
+  border-color: var(--accent);
+  color: #222;
+  font-weight: 600;
+}
+
+.pagination-container .page-link:hover {
+  background-color: var(--primary);
+  color: #fff;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 991px) {
+  .filter-card {
+    margin-bottom: 25px;
+  }
+}
+
 </style>
 
-<div class="container py-5">
+<section class="shop-products container" data-aos="fade-up">
     <div class="row g-4">
         <!-- Sidebar Filter -->
         <div class="col-lg-3">
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <strong>Filter by Category</strong>
-                </div>
+            <div class="filter-card">
+                <div class="card-header">Filter by Category</div>
                 <div class="card-body category-filter">
                     <form id="category-filter-form">
                         @php
                             $categories = [
-                                'Tiles',
-                                'Vinyl',
-                                'Borders',
-                                'Mosaics',
-                                'Sanitary Wares',
-                                'WPC Panels & Wall Cladding',
-                                'Tile Adhesive, Grout & Epoxy',
-                                'Tools, Tile Spacers & Levelers'
+                                'Tiles', 'Vinyl', 'Borders', 'Mosaics',
+                                'Sanitary Wares', 'WPC Panels & Wall Cladding',
+                                'Tile Adhesive, Grout & Epoxy', 'Tools, Tile Spacers & Levelers'
                             ];
                             $selectedCategories = request()->input('categories', []);
                             if (!is_array($selectedCategories)) {
@@ -100,17 +233,17 @@
                             </div>
                         @endforeach
 
-                        <button type="submit" class="btn btn-outline-primary btn-sm mt-3 w-100">Apply Filter</button>
-                        <button type="button" id="clear-filters" class="btn btn-outline-danger btn-sm mt-2 w-100">Remove Filter</button>
+                        <button type="submit" class="btn btn-outline-primary btn-sm w-100 mt-3">Apply Filter</button>
+                        <button type="button" id="clear-filters" class="btn btn-outline-danger btn-sm w-100 mt-2">Remove Filter</button>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- Products & Sort -->
+        <!-- Products -->
         <div class="col-lg-9">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h5 mb-0">All Products</h2>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="fw-bold text-primary mb-0">All Products</h2>
                 <select class="form-select sort-select" id="sort">
                     <option value="latest" {{ $sort === 'latest' ? 'selected' : '' }}>Latest</option>
                     <option value="price_asc" {{ $sort === 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
@@ -121,20 +254,20 @@
             @if ($products->count())
                 <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
                     @foreach ($products as $product)
-                        <div class="col">
+                        <div class="col" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
                             <div class="product-card h-100">
-                                <img src="/storage/{{ $product->image }}" class="card-img-top rounded" alt="{{ $product->name }}">
-                                <div class="card-body text-center">
-                                    <h5 class="card-title">{{ $product->name }}</h5>
-                                    <p class="card-text">₱{{ number_format($product->price, 2) }}</p>
+                                <img src="/storage/{{ $product->image }}" alt="{{ $product->name }}">
+                                <div class="card-body">
+                                    <h5>{{ $product->name }}</h5>
+                                    <p>₱{{ number_format($product->price, 2) }}</p>
 
                                     @if ($product->quantity > 0)
-                                        <p class="card-text">Stock: {{ $product->quantity }}</p>
+                                        <p>Stock: {{ $product->quantity }}</p>
                                     @else
-                                        <p class="card-text text-danger fw-bold">Out of Stock</p>
+                                        <p class="text-danger fw-bold">Out of Stock</p>
                                     @endif
 
-                                    <a href="{{ route('product.show', $product->id) }}" class="btn btn-primary">View Details</a>
+                                    <button class="btn mt-2" onclick="showLoadingAndRedirect({{ $product->id }})">View Details</button>
                                 </div>
                             </div>
                         </div>
@@ -145,12 +278,12 @@
             @endif
 
             <!-- Pagination -->
-            <div class="pagination-container text-center mt-4">
-                <ul class="pagination">
+            <div class="pagination-container text-center mt-5">
+                <ul class="pagination justify-content-center">
                     @if ($products->onFirstPage())
-                        <li class="page-item disabled"><span class="page-link">« Previous</span></li>
+                        <li class="page-item disabled"><span class="page-link">« Prev</span></li>
                     @else
-                        <li class="page-item"><a href="{{ $products->previousPageUrl() }}" class="page-link">« Previous</a></li>
+                        <li class="page-item"><a href="{{ $products->previousPageUrl() }}" class="page-link">« Prev</a></li>
                     @endif
 
                     @for ($i = 1; $i <= $products->lastPage(); $i++)
@@ -168,14 +301,21 @@
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- Loading Overlay -->
 <x-loading-overlay id="view-loading" />
 
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
+    AOS.init({ duration: 900, once: true });
+
     function showLoading() {
         document.getElementById('view-loading').classList.add('active');
+    }
+
+    function showLoadingAndRedirect(id) {
+        showLoading();
+        setTimeout(() => window.location.href = `/product/${id}`, 800);
     }
 
     // Sorting change
@@ -187,50 +327,29 @@
         window.location.href = url.toString();
     });
 
-    // Filter submit
+    // Filter form
     document.getElementById('category-filter-form').addEventListener('submit', function (e) {
         e.preventDefault();
         showLoading();
 
         const url = new URL(window.location.href);
         url.searchParams.delete('page');
-        url.searchParams.delete('categories[]');
-
-        // Clear existing category params
         for (const key of [...url.searchParams.keys()]) {
-            if (key.startsWith("categories")) {
-                url.searchParams.delete(key);
-            }
+            if (key.startsWith("categories")) url.searchParams.delete(key);
         }
 
-        // Add new checked categories
         const selected = document.querySelectorAll('input[name="categories[]"]:checked');
-        selected.forEach(el => {
-            url.searchParams.append('categories[]', el.value);
-        });
+        selected.forEach(el => url.searchParams.append('categories[]', el.value));
 
         window.location.href = url.toString();
     });
 
-    // Clear filters
     document.getElementById('clear-filters').addEventListener('click', function () {
         showLoading();
         const url = new URL(window.location.href);
         url.searchParams.delete('categories[]');
         url.searchParams.delete('page');
         window.location.href = url.toString();
-    });
-
-    // View Details buttons
-    document.querySelectorAll('.btn-primary').forEach(btn => {
-        if (btn.textContent.trim() === 'View Details') {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault();
-                showLoading();
-                const href = this.href;
-                setTimeout(() => window.location.href = href, 200);
-            });
-        }
     });
 </script>
 @endsection

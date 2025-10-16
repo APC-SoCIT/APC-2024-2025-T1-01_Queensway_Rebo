@@ -1,52 +1,156 @@
 <!-- Navbar with color palette applied -->
 <style>
     :root {
-        --light-green: #c1e1c1;
-        --beige: #e1ddd1;
-        --light-gray: #e6d6d6;
-        --white: #fefefe;
-        --blue-accent: #8890d4;
+        --primary: #004b8d;
+        /* Deep AI Blue */
+        --accent: #f4b400;
+        /* Gold Accent */
+        --light-beige: #e1ddd1;
+        --soft-blue: #add8e6;
         --deep-blue: #2608bd;
-        --pastel-blue: #add8e6;
-        --bold-blue: #342de5;
+        --white: #ffffff;
+        --nav-shadow: rgba(0, 0, 0, 0.08);
+        --hover-bg: rgba(0, 75, 141, 0.1);
     }
 
-    /* Navbar styling */
+    /* NAVBAR BASE */
     .navbar-custom {
-        background-color: var(--beige) !important;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        background: linear-gradient(90deg, var(--light-beige) 0%, var(--soft-blue) 100%);
+        box-shadow: 0 4px 10px var(--nav-shadow);
+        transition: all 0.3s ease;
+        padding: 0.8rem 1rem;
     }
 
+    .navbar-custom.scrolled {
+        background: linear-gradient(90deg, var(--primary) 0%, var(--deep-blue) 100%);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    /* BRAND LOGO */
     .navbar-brand {
-        font-weight: 600;
-        color: var(--deep-blue);
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 1.4rem;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
     }
 
     .navbar-brand:hover {
-        color: var(--bold-blue);
+        color: var(--accent);
+        transform: scale(1.02);
+        transition: all 0.2s ease;
     }
 
+    /* NAV LINKS */
     .nav-link {
-        color: black;
+        color: #212529;
         font-weight: 600;
-        transition: color 0.15s ease-in-out;
+        margin: 0 8px;
+        position: relative;
+        transition: color 0.3s ease;
     }
 
     .nav-link:hover,
     .nav-link.active {
-        color: #26707c;
+        color: var(--primary);
     }
 
+    /* UNDERLINE EFFECT ON HOVER */
+    .nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: -4px;
+        left: 50%;
+        width: 0;
+        height: 2px;
+        background-color: var(--accent);
+        transition: all 0.3s ease;
+        transform: translateX(-50%);
+    }
+
+    .nav-link:hover::after,
+    .nav-link.active::after {
+        width: 40%;
+    }
+
+    /* Remove Bootstrap dropdown caret */
+    .nav-link.dropdown-toggle::after {
+        display: none !important;
+    }
+
+
+    /* DROPDOWN MENU */
     .dropdown-menu {
         border: none;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        overflow: hidden;
+        animation: dropdownFade 0.2s ease;
+    }
+
+    @keyframes dropdownFade {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .dropdown-item {
+        font-weight: 500;
+        color: #212529;
+        transition: all 0.3s ease;
+        padding: 10px 20px;
     }
 
     .dropdown-item:hover {
-        background-color: var(--light-green);
+        background-color: var(--hover-bg);
+        color: var(--primary);
+    }
+
+    /* CART BADGE */
+    .nav-link .badge {
+        font-size: 0.75rem;
+        position: relative;
+        top: -2px;
+        background-color: var(--accent) !important;
         color: #000;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    /* USER MENU ICON */
+    #userMenu {
+        font-size: 1.5rem;
+        color: var(--primary);
+        transition: 0.3s;
+    }
+
+    #userMenu:hover {
+        color: var(--accent);
+        transform: translateY(-1px);
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 992px) {
+        .navbar-custom {
+            background: var(--white);
+        }
+
+        .navbar-nav {
+            text-align: center;
+        }
+
+        .nav-link {
+            padding: 10px 0;
+        }
     }
 </style>
+
 
 <nav class="navbar navbar-expand-lg navbar-light navbar-custom">
     <div class="container">
@@ -93,10 +197,12 @@
                         <a class="nav-link position-relative d-flex align-items-center" href="/cart">
                             Cart
                             @php $count = count(session('cart', [])); @endphp
-                            @if ($count > 0)
-                                <span class="badge bg-danger rounded-pill ms-2">{{ $count }}</span>
-                            @endif
+                            <span id="cart-badge" class="badge bg-danger rounded-pill ms-2"
+                                style="{{ $count ? '' : 'display:none;' }}">
+                                {{ $count }}
+                            </span>
                         </a>
+
                     </li>
 
                     <!-- User Dropdown -->

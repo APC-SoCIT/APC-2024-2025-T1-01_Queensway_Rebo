@@ -5,4 +5,4 @@
 <p><strong>Email:</strong> {{ $admin->email }}</p>
 <p><strong>Password:</strong> {{ $password }}</p>
 
-<p>You're required to change your password after logging in.</p>
+

@@ -10,7 +10,7 @@
             padding: 1.5rem 1.25rem;
             border: 1px solid #e6e6e6;
             position: relative;
-        }
+        }a
 
         .small-box-clean:hover {
             box-shadow: 0 4px 8px rgba(0, 0, 0, .08);
@@ -19,7 +19,7 @@
         .small-box-clean .inner h3 {
             font-size: 1.6rem;
             font-weight: 700;
-            margin: 0 0 .15rem;
+            margin: 0 0 .15rem;a
         }
 
         .small-box-clean .inner p {
