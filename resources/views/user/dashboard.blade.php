@@ -120,7 +120,7 @@
                                 <td>₱{{ number_format($order->total_amount, 2) }}</td>
                                 <td>{{ ucfirst($order->order_status) }}</td>
                                 <td>
-                                    <a href="{{ route('orders.show', $order) }}">Track your order</a>
+                                    <a href="{{ route('orders.show', ['order' => $order->order_number]) }}">Track your order</a>
                                 </td>
                             </tr>
                         @empty
