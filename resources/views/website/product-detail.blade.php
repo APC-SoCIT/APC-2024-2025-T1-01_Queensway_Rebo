@@ -1,328 +1,351 @@
 @extends('layouts.website')
 
 @section('content')
-    <!-- AOS Animations -->
-    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
-    <style>
-        :root {
-            --primary: #004b8d;
-            --accent: #f4b400;
-            --background: #f8f9fb;
-            --white: #ffffff;
-            --gray: #6c757d;
-            --text-dark: #1c1c1c;
-            --card-shadow: rgba(0, 0, 0, 0.08);
-            --divider-gradient: linear-gradient(90deg, rgba(0, 75, 141, 0.2), rgba(244, 180, 0, 0.3));
-        }
+<style>
+    :root {
+        --primary: #222;
+        --accent: #f4b400;
+        --bg: #fafafa;
+        --gray: #6c757d;
+        --text: #1c1c1c;
+        --shadow: rgba(0, 0, 0, 0.06);
+        --border: #e5e5e5;
+    }
 
-        body {
-            background-color: var(--background);
-            color: var(--text-dark);
-            font-family: 'Poppins', 'Inter', sans-serif;
-            overflow-x: hidden;
-        }
+    body {
+        background-color: var(--bg);
+        color: var(--text);
+        font-family: 'Poppins', sans-serif;
+    }
 
-        /* Section Divider */
-        .section-divider {
-            width: 120px;
-            height: 5px;
-            background: var(--divider-gradient);
-            border-radius: 10px;
-            margin: 40px auto;
-        }
+    /* ---------- PRODUCT SECTION ---------- */
+    .product-section {
+        max-width: 1200px;
+        margin: 80px auto;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 6px 20px var(--shadow);
+        padding: 60px;
+    }
 
-        /* Product Detail Container */
-        .product-detail-container {
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px var(--card-shadow);
-            padding: 50px 40px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
+    .product-image {
+        border-radius: 15px;
+        width: 100%;
+        height: 420px;
+        object-fit: cover;
+        background-color: #f2f2f2;
+    }
 
-        .product-detail-container::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: var(--divider-gradient);
-        }
+    .product-title {
+        font-weight: 700;
+        font-size: 2rem;
+        color: var(--primary);
+        margin-bottom: 10px;
+    }
 
-        .product-detail-container:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 36px rgba(0, 75, 141, 0.15);
-        }
+    .product-price {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: 15px;
+    }
 
-        .product-detail-container img {
-            border-radius: 15px;
-            box-shadow: 0 4px 20px var(--card-shadow);
-        }
+    .product-description {
+        color: var(--gray);
+        font-size: 0.95rem;
+        line-height: 1.7;
+    }
 
-        .product-detail-container h1 {
-            font-weight: 700;
-            color: var(--primary);
-        }
+    .product-meta {
+        color: var(--gray);
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
 
-        .product-detail-container h3 {
-            color: var(--accent);
-            font-weight: 700;
-        }
+    /* ---------- BUTTONS ---------- */
+    .btn-buy,
+    .btn-cart {
+        border: none;
+        border-radius: 30px;
+        padding: 12px 30px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
 
-        /* Buttons */
-        .btn-primary {
-            background-color: var(--primary);
-            border: none;
-            border-radius: 30px;
-            padding: 10px 28px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
+    .btn-buy {
+        background: var(--accent);
+        color: var(--primary);
+    }
 
-        .btn-primary:hover {
-            background-color: #003c73;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 75, 141, 0.3);
-        }
+    .btn-buy:hover {
+        background: #e2a800;
+        transform: translateY(-2px);
+    }
 
-        .btn-success {
-            border-radius: 30px;
-            font-weight: 600;
-        }
+    .btn-cart {
+        border: 1.5px solid var(--primary);
+        color: var(--primary);
+        background: #fff;
+    }
 
-        /* Related Section / Tile Calculator / Tutorials */
-        .related-section {
-            background: var(--white);
-            border-radius: 20px;
-            box-shadow: 0 10px 30px var(--card-shadow);
-            padding: 50px 40px;
-            margin-top: 60px;
-            position: relative;
-            overflow: hidden;
-        }
+    .btn-cart:hover {
+        background: var(--primary);
+        color: #fff;
+        transform: translateY(-2px);
+    }
 
-        .related-section::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: var(--divider-gradient);
-        }
+    /* ---------- TILE CALCULATOR ---------- */
+    .calculator-section {
+        text-align: center;
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px var(--shadow);
+        padding: 60px;
+        margin: 80px auto;
+        max-width: 900px;
+    }
 
-        .related-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--primary);
-            text-align: center;
-            margin-bottom: 30px;
-        }
+    .calculator-section h2 {
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 10px;
+    }
 
-        .related-card {
-            border-radius: 15px;
-            overflow: hidden;
-            border: none;
-            box-shadow: 0 4px 20px var(--card-shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
+    .calculator-section p {
+        color: var(--gray);
+        margin-bottom: 30px;
+    }
 
-        .related-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.1);
-        }
+    .form-control {
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 14px;
+        transition: 0.3s;
+    }
 
-        .related-card img {
-            height: 180px;
-            object-fit: cover;
-            width: 100%;
-        }
+    .form-control:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 6px rgba(244, 180, 0, 0.3);
+        outline: none;
+    }
 
-        /* Inputs */
-        input[type="number"] {
-            border: 1.5px solid var(--primary);
-            border-radius: 10px;
-            padding: 10px 14px;
-            transition: all 0.3s;
-        }
+    .btn-calc {
+        background: var(--primary);
+        color: #fff;
+        border-radius: 30px;
+        padding: 12px 26px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
 
-        input[type="number"]:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 8px rgba(0, 75, 141, 0.3);
-        }
-    </style>
+    .btn-calc:hover {
+        background: #000;
+        transform: translateY(-2px);
+    }
 
-    <div class="container my-5">
-        <div class="product-detail-container shadow-sm" data-aos="fade-up">
-            <div class="row align-items-center g-4">
-                <div class="col-md-6">
-                    <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="img-fluid w-100">
-                </div>
-                <div class="col-md-6">
-                    <h1>{{ $product->name }}</h1>
-                    <h3 class="mb-3">₱{{ number_format($product->price, 2) }}</h3>
+    /* ---------- TUTORIAL VIDEOS ---------- */
+    .tutorial-section {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 4px 15px var(--shadow);
+        padding: 60px;
+        margin: 80px auto;
+        max-width: 1100px;
+    }
 
-                    @if($product->sku)
-                        <p><strong>SKU:</strong> {{ $product->sku }}</p>
-                    @endif
+    .tutorial-section h2 {
+        font-weight: 700;
+        color: var(--primary);
+        text-align: center;
+        margin-bottom: 40px;
+    }
 
-                    <p><strong>Description:</strong><br>{{ $product->description }}</p>
+    .video-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
 
-                    <p>
-                        <strong>Stock:</strong>
-                        @if($product->quantity > 0)
-                            {{ $product->quantity }}
-                        @else
-                            <span class="text-danger fw-bold">Out of Stock</span>
-                        @endif
-                    </p>
+    .video-wrapper iframe {
+        border-radius: 15px;
+        box-shadow: 0 4px 10px var(--shadow);
+        width: 100%;
+        max-width: 480px;
+        height: 270px;
+    }
 
-                    @if($product->quantity > 0)
-                        <form id="add-to-cart-form" action="{{ route('cart.add') }}" method="POST">
-                            @csrf
-                            <div class="mb-3">
-                                <label for="quantity" class="form-label">Quantity</label>
-                                <input type="number" name="quantity" class="form-control" value="1" min="1"
-                                    max="{{ $product->quantity }}" required>
-                            </div>
-                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                            @auth
-                                <button type="submit" class="btn btn-primary">Add to Cart</button>
-                            @else
-                                <button type="button" class="btn btn-secondary" disabled>
-                                    Add to Cart (Login Required)
-                                </button>
-                            @endauth
-                        </form>
-                    @endif
-                </div>
-            </div>
+    /* ---------- RELATED PRODUCTS ---------- */
+    .related-section {
+        background: #fff;
+        padding: 80px 60px;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px var(--shadow);
+        max-width: 1200px;
+        margin: 0 auto 100px;
+    }
+
+    .related-section h2 {
+        text-align: center;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 40px;
+    }
+
+    .view-btn {
+        background: var(--accent);
+        color: var(--primary);
+        border-radius: 25px;
+        font-weight: 600;
+        padding: 10px 25px;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px var(--shadow);
+    }
+
+    .view-btn:hover {
+        background: #e2a800;
+        color: #000;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px var(--shadow);
+    }
+</style>
+
+<section class="product-section" data-aos="fade-up">
+    <div class="row align-items-center g-5">
+        <div class="col-md-6">
+            <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="product-image">
         </div>
 
-        <!-- Divider -->
-        <div class="section-divider" data-aos="zoom-in"></div>
-
-        <!-- 🧮 Tile Calculator -->
-        <div class="related-section" data-aos="fade-up">
-            <h2 class="related-title">🧮 Tile Calculator</h2>
-            <p class="text-center text-muted mb-4">Estimate how many tiles you’ll need for your project.</p>
-
-            <form id="tile-calculator" class="row g-3 justify-content-center">
-                <div class="col-md-5">
-                    <label class="form-label">Room Length (m)</label>
-                    <input type="number" step="0.01" id="room_length" class="form-control" required>
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label">Room Width (m)</label>
-                    <input type="number" step="0.01" id="room_width" class="form-control" required>
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label">Tile Length (cm)</label>
-                    <input type="number" step="0.1" id="tile_length" class="form-control"
-                        value="{{ $product->length ?? '' }}" required>
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label">Tile Width (cm)</label>
-                    <input type="number" step="0.1" id="tile_width" class="form-control" value="{{ $product->width ?? '' }}"
-                        required>
-                </div>
-                <div class="col-md-10 text-center">
-                    <button type="button" class="btn btn-primary mt-3" onclick="calculateTiles()">Calculate</button>
-                </div>
-            </form>
-
-            <div class="mt-4 text-center" id="tile-result" style="display:none;">
-                <h4>Estimated Tiles Needed: <span id="tiles-needed"></span></h4>
-                <p><small>(Including 10% wastage)</small></p>
+        <div class="col-md-6">
+            <span class="text-muted mb-2 d-block">{{ $product->category ?? 'Category' }}</span>
+            <h1 class="product-title">{{ $product->name }}</h1>
+            <div class="product-price">₱{{ number_format($product->price, 2) }}</div>
+            <p class="product-meta">
+                @if($product->sku) <strong>SKU:</strong> {{ $product->sku }} <br> @endif
+                <strong>Stock:</strong>
                 @if($product->quantity > 0)
-                    <form id="tile-cart-form" action="{{ route('cart.add') }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="product_id" value="{{ $product->id }}">
-                        <input type="hidden" name="quantity" id="calculated-quantity">
-                        @auth
-                            <button type="submit" class="btn btn-success mt-2">Add to Cart with Calculated Quantity</button>
-                        @else
-                            <button type="button" class="btn btn-secondary mt-2" disabled>
-                                Login Required
-                            </button>
-                        @endauth
-                    </form>
+                {{ $product->quantity }}
+                @else
+                <span class="text-danger fw-bold">Out of Stock</span>
                 @endif
+            </p>
+            <p class="product-description">{{ $product->description }}</p>
+
+            @if($product->quantity > 0)
+            <form action="{{ route('cart.add') }}" method="POST" class="mt-4">
+                @csrf
+                <label for="quantity" class="form-label">Quantity</label>
+                <input type="number" name="quantity" value="1" min="1" max="{{ $product->quantity }}"
+                    class="form-control w-25 mb-3" required>
+                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                @auth
+                <button type="submit" class="btn-cart me-2">Add to Cart</button>
+                <a href="{{ route('checkout') }}" class="btn-buy">Buy Now</a>
+                @else
+                <button type="button" class="btn-cart" disabled>Login to Purchase</button>
+                @endauth
+            </form>
+            @endif
+        </div>
+    </div>
+</section>
+
+<!-- TILE CALCULATOR -->
+<section class="calculator-section" data-aos="fade-up">
+    <h2>🧮 Tile Calculator</h2>
+    <p>Estimate how many tiles you’ll need for your project.</p>
+    <form class="row justify-content-center g-3" id="tile-calculator">
+        <div class="col-md-5">
+            <label>Room Length (m)</label>
+            <input type="number" step="0.01" id="room_length" class="form-control" required>
+        </div>
+        <div class="col-md-5">
+            <label>Room Width (m)</label>
+            <input type="number" step="0.01" id="room_width" class="form-control" required>
+        </div>
+        <div class="col-md-5">
+            <label>Tile Length (cm)</label>
+            <input type="number" step="0.1" id="tile_length" class="form-control"
+                value="{{ $product->length ?? '' }}" required>
+        </div>
+        <div class="col-md-5">
+            <label>Tile Width (cm)</label>
+            <input type="number" step="0.1" id="tile_width" class="form-control"
+                value="{{ $product->width ?? '' }}" required>
+        </div>
+        <div class="col-md-10">
+            <button type="button" class="btn-calc mt-3" onclick="calculateTiles()">Calculate</button>
+        </div>
+    </form>
+
+    <div id="tile-result" class="mt-4" style="display:none;">
+        <h4 class="fw-bold">Estimated Tiles Needed: <span id="tiles-needed"></span></h4>
+        <p class="text-muted"><small>(Including 10% wastage)</small></p>
+    </div>
+</section>
+
+<!-- 🎥 Tutorial Videos -->
+@if(!empty($tutorialVideos))
+<section class="tutorial-section" data-aos="fade-up">
+    <h2>🎥 Installation & Tutorial Videos</h2>
+    <div class="video-wrapper">
+        @foreach($tutorialVideos as $video)
+            <div>
+                <video class="w-100 rounded" controls>
+                    <source src="{{ asset('storage/videos/' . rawurlencode($video)) }}" type="video/mp4">
+                </video>
+                <p class="mt-2 text-center fw-semibold">
+                    {{ pathinfo($video, PATHINFO_FILENAME) }}
+                </p>
+            </div>
+        @endforeach
+    </div>
+</section>
+@endif
+
+
+
+<!-- RELATED PRODUCTS -->
+@if(isset($relatedProducts) && $relatedProducts->count())
+<section class="related-section" data-aos="fade-up">
+    <h2>Related Products</h2>
+    <div class="row g-4 justify-content-center">
+        @foreach($relatedProducts as $related)
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden h-100 text-center">
+                <img src="/storage/{{ $related->image }}" alt="{{ $related->name }}"
+                    class="img-fluid" style="height: 220px; object-fit: cover;">
+                <div class="p-3">
+                    <h6 class="fw-semibold mt-2" style="color: var(--primary);">{{ $related->name }}</h6>
+                    <p class="text-muted mb-3">₱{{ number_format($related->price, 2) }}</p>
+                    <a href="/product/{{ $related->id }}" class="btn view-btn">View Details</a>
+                </div>
             </div>
         </div>
-
-        <!-- Tutorial Videos -->
-        @if(!empty($tutorialVideos))
-            <div class="related-section" data-aos="fade-up">
-                <h2 class="related-title">🎥 Tutorial Videos</h2>
-                <div class="row row-cols-1 row-cols-md-2 g-4">
-                    @foreach($tutorialVideos as $video)
-                        <div class="col">
-                            <div class="related-card p-3">
-                                <video class="w-100 rounded" controls>
-                                    <source src="{{ asset('storage/videos/' . rawurlencode($video)) }}" type="video/mp4">
-                                </video>
-                                <p class="mt-2 text-center fw-semibold">{{ pathinfo($video, PATHINFO_FILENAME) }}</p>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-
-        <!-- Related Products -->
-        @if(isset($relatedProducts) && $relatedProducts->count())
-            <div class="related-section" data-aos="fade-up">
-                <h2 class="related-title">🧰 Related Products</h2>
-                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-4 g-4">
-                    @foreach($relatedProducts as $related)
-                        <div class="col">
-                            <div class="related-card h-100">
-                                <img src="{{ asset('storage/' . $related->image) }}" alt="{{ $related->name }}">
-                                <div class="card-body text-center">
-                                    <h6>{{ $related->name }}</h6>
-                                    <p class="text-primary fw-semibold">₱{{ number_format($related->price, 2) }}</p>
-                                    <p class="{{ $related->quantity > 0 ? 'text-success' : 'text-danger' }}">
-                                        {{ $related->quantity > 0 ? 'In Stock' : 'Out of Stock' }}
-                                    </p>
-                                    <a href="{{ route('product.show', $related->id) }}"
-                                        class="btn btn-outline-primary btn-sm rounded-pill">View</a>
-                                </div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
+        @endforeach
     </div>
+</section>
+@endif
 
-    <x-loading-overlay id="view-loading" />
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+    AOS.init({ duration: 1000, once: true });
 
-    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-    <script>
-        AOS.init({ duration: 1000, once: true });
-
-        document.getElementById('add-to-cart-form')?.addEventListener('submit', () => {
-            document.getElementById('view-loading').classList.add('active');
-        });
-
-        function calculateTiles() {
-            const l = parseFloat(room_length.value);
-            const w = parseFloat(room_width.value);
-            const tl = parseFloat(tile_length.value);
-            const tw = parseFloat(tile_width.value);
-            if (l <= 0 || w <= 0 || tl <= 0 || tw <= 0) return alert('Please enter valid positive numbers.');
-            const roomArea = l * w;
-            const tileArea = (tl / 100) * (tw / 100);
-            const tiles = Math.ceil((roomArea / tileArea) * 1.1);
-            document.getElementById('tiles-needed').textContent = tiles;
-            document.getElementById('tile-result').style.display = 'block';
-            document.getElementById('calculated-quantity').value = tiles;
-        }
-    </script>
+    function calculateTiles() {
+        const l = parseFloat(room_length.value);
+        const w = parseFloat(room_width.value);
+        const tl = parseFloat(tile_length.value);
+        const tw = parseFloat(tile_width.value);
+        if (l <= 0 || w <= 0 || tl <= 0 || tw <= 0)
+            return alert('Please enter valid positive numbers.');
+        const roomArea = l * w;
+        const tileArea = (tl / 100) * (tw / 100);
+        const tiles = Math.ceil((roomArea / tileArea) * 1.1);
+        document.getElementById('tiles-needed').textContent = tiles;
+        document.getElementById('tile-result').style.display = 'block';
+    }
+</script>
 @endsection

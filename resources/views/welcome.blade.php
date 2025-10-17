@@ -1,382 +1,477 @@
 @extends('layouts.website')
 
 @section('content')
-    <!-- AOS for animations -->
-    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<!-- AOS for animations -->
+<link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
-    <style>
-        :root {
-            --primary: #004b8d;
-            /* hardware blue */
-            --accent: #f4b400;
-            /* warm gold accent */
-            --background: #f8f9fb;
-            --white: #ffffff;
-            --gray: #6c757d;
-            --text-dark: #1c1c1c;
-            --card-shadow: rgba(0, 0, 0, 0.08);
-            --divider-gradient: linear-gradient(90deg, rgba(0, 75, 141, 0.2), rgba(244, 180, 0, 0.3));
-        }
+<style>
+    :root {
+        --primary: #222;
+        --accent: #f4b400;
+        --bg: #fafafa;
+        --gray: #6c757d;
+        --text: #1c1c1c;
+        --shadow: rgba(0, 0, 0, 0.08);
+    }
 
-        body {
-            background-color: var(--background);
-            color: var(--text-dark);
-            font-family: 'Poppins', 'Inter', sans-serif;
-            overflow-x: hidden;
-        }
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        overflow-x: hidden;
+    }
 
-        /* --- HERO --- */
-        #heroCarousel {
-            margin-bottom: 80px;
-        }
+    /* ---------- HERO ---------- */
+    .hero {
+        background: url('/storage/images/slide1.jpg') center/cover no-repeat;
+        height: 90vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        position: relative;
+    }
 
-        .hero-slide {
-            height: 520px;
-            background-size: cover !important;
-            background-position: center !important;
-            position: relative;
-        }
+    .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+    }
 
-        .hero-slide::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to right, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3));
-            z-index: 1;
-        }
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        color: #fff;
+        max-width: 700px;
+        padding: 0 20px;
+    }
 
-        .carousel-caption {
-            z-index: 2;
-            text-align: left;
-            left: 10%;
-            bottom: 20%;
-        }
+    .hero-content h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
 
-        .carousel-caption h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            color: var(--white);
-            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-        }
+    .hero-content p {
+        font-size: 1.1rem;
+        margin-bottom: 25px;
+        color: #f2f2f2;
+    }
 
-        .carousel-caption p {
-            font-size: 1.2rem;
-            color: #f0f0f0;
-            max-width: 500px;
-        }
+    .hero-content .btn {
+        background: var(--accent);
+        color: #222;
+        font-weight: 600;
+        border-radius: 30px;
+        padding: 12px 32px;
+        transition: 0.3s;
+    }
 
-        .carousel-caption .btn-primary {
-            background-color: var(--accent);
-            color: #222;
-            font-weight: 600;
-            border: none;
-            border-radius: 30px;
-            padding: 12px 32px;
-            transition: all 0.3s ease;
-        }
+    .hero-content .btn:hover {
+        background: #e2a800;
+        transform: translateY(-3px);
+    }
 
-        .carousel-caption .btn-primary:hover {
-            background-color: #e2a800;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.2);
-        }
+    /* ---------- AI FINDER ---------- */
+    .ai-finder {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px var(--shadow);
+        padding: 60px;
+        max-width: 900px;
+        margin: -80px auto 80px;
+        text-align: center;
+        position: relative;
+        z-index: 5;
+    }
 
-        /* --- SECTION DIVIDER --- */
-        .section-divider {
-            width: 120px;
-            height: 5px;
-            background: var(--divider-gradient);
-            border-radius: 10px;
-            margin: 40px auto;
-        }
+    .ai-finder h2 {
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 10px;
+    }
 
-        /* --- AI FINDER --- */
-        .ai-finder {
-            background: var(--white) url('https://www.transparenttextures.com/patterns/cubes.png');
-            border-radius: 20px;
-            box-shadow: 0 10px 30px var(--card-shadow);
-            padding: 60px;
-            max-width: 900px;
-            margin: 100px auto;
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
+    .ai-finder input[type="text"],
+    .ai-finder input[type="file"] {
+        border: 1.5px solid var(--primary);
+        border-radius: 10px;
+        padding: 12px 16px;
+        margin-bottom: 15px;
+        width: 100%;
+        transition: 0.3s;
+    }
 
-        .ai-finder::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: var(--divider-gradient);
-        }
+    .ai-finder input:focus {
+        outline: none;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+    }
 
-        .ai-finder:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 16px 36px rgba(0, 75, 141, 0.15);
-        }
+    .ai-finder button {
+        background: var(--primary);
+        color: #fff;
+        border: none;
+        border-radius: 30px;
+        padding: 12px 32px;
+        font-weight: 600;
+        transition: 0.3s;
+    }
 
-        .ai-finder h2 {
-            font-weight: 700;
-            color: var(--primary);
-        }
+    .ai-finder button:hover {
+        background: #000;
+        transform: translateY(-2px);
+    }
 
-        .ai-finder p {
-            color: var(--gray);
-        }
+    /* ---------- BENEFITS ---------- */
+    .benefits {
+        background: #fff;
+        padding: 80px 0;
+        text-align: center;
+    }
 
-        .ai-finder input[type="text"],
-        .ai-finder input[type="file"] {
-            border: 1.5px solid var(--primary);
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 15px;
-            width: 100%;
-            transition: all 0.3s;
-        }
+    .benefits .icon {
+        font-size: 2rem;
+        color: var(--accent);
+        margin-bottom: 15px;
+    }
 
-        .ai-finder input[type="text"]:focus,
-        .ai-finder input[type="file"]:focus {
-            outline: none;
-            box-shadow: 0 0 8px rgba(0, 75, 141, 0.3);
-            border-color: var(--accent);
-        }
+    .benefits h5 {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
 
-        .ai-finder button {
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 30px;
-            padding: 12px 32px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
+    .benefits p {
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
 
-        .ai-finder button:hover {
-            background-color: #003c73;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 75, 141, 0.3);
-        }
+    /* ---------- PRODUCTS ---------- */
+    .products {
+        background: var(--bg);
+        padding: 100px 0;
+    }
 
-        /* --- PRODUCTS --- */
-        .products {
-            background: linear-gradient(180deg, #f8f9fb 0%, #eef2f7 100%);
-            padding: 100px 0;
-            position: relative;
-        }
+    .products h2 {
+        text-align: center;
+        font-weight: 700;
+        margin-bottom: 50px;
+    }
 
-        .products::before {
-            content: "";
-            position: absolute;
-            top: -30px;
-            left: 0;
-            right: 0;
-            height: 50px;
-            background: var(--divider-gradient);
-            clip-path: polygon(0 100%, 100% 0, 100% 100%);
-        }
+    .product-card {
+        background: #fff;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px var(--shadow);
+        transition: all 0.3s;
+        overflow: hidden;
+        text-align: center;
+    }
 
-        .product-card {
-            background: var(--white);
-            border-radius: 15px;
-            box-shadow: 0 4px 20px var(--card-shadow);
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
+    .product-card:hover {
+        transform: translateY(-5px);
+    }
 
-        .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-        }
+    .product-card img {
+        width: 100%;
+        height: 230px;
+        object-fit: cover;
+    }
 
-        .product-card img {
-            height: 230px;
-            width: 100%;
-            object-fit: cover;
-        }
+    .product-card h5 {
+        color: var(--primary);
+        font-weight: 600;
+        margin-top: 10px;
+    }
 
-        .card-body {
-            text-align: center;
-            padding: 20px;
-        }
+    .product-card p {
+        color: var(--gray);
+    }
 
-        .product-card h5 {
-            color: var(--primary);
-            font-weight: 600;
-        }
+    /* ---------- CATEGORIES ---------- */
+    .categories {
+        padding: 80px 0;
+        background: #fff;
+    }
 
-        .product-card p {
-            color: var(--gray);
-        }
+    .categories h2 {
+        text-align: center;
+        font-weight: 700;
+        margin-bottom: 50px;
+    }
 
-        .product-card .btn {
-            background-color: var(--accent);
-            color: #222;
-            font-weight: 600;
-            border-radius: 30px;
-            padding: 8px 20px;
-            transition: 0.3s;
-        }
+    .category-card {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px var(--shadow);
+        text-align: center;
+        transition: 0.3s;
+    }
 
-        .product-card .btn:hover {
-            background-color: #e2a800;
-        }
+    .category-card:hover {
+        transform: translateY(-6px);
+    }
 
-        .product-card img {
-            width: 100%;
-            height: auto;
-            max-height: 230px;
-            object-fit: contain;
-        }
+    .category-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
 
+    .category-card h5 {
+        padding: 15px 0;
+        font-weight: 600;
+    }
 
-        /* --- FOOTER --- */
-        footer {
-            background-color: var(--primary);
-            color: var(--white);
-            padding: 40px 0;
-            text-align: center;
-            font-size: 0.9rem;
-        }
+    /* ---------- TESTIMONIALS ---------- */
+    .testimonials {
+        background: var(--bg);
+        padding: 100px 0;
+        text-align: center;
+    }
 
-        footer p {
-            margin: 0;
-            color: #e0e0e0;
-        }
-    </style>
+    .testimonial-card {
+        background: #fff;
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 15px var(--shadow);
+        transition: 0.3s;
+    }
 
+    .testimonial-card:hover {
+        transform: translateY(-5px);
+    }
 
-    <!-- HERO CAROUSEL -->
-    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
-        <div class="carousel-inner">
-            <div class="carousel-item active hero-slide" style="background-image: url('/storage/images/slide1.jpg')">
-                <div class="carousel-caption" data-aos="fade-up">
-                    <h1>Build with Quality</h1>
-                    <p>Tiles, fixtures, and tools designed for long-lasting performance.</p>
-                    <a href="/shop" class="btn btn-primary mt-3">Shop Now</a>
-                </div>
+    .testimonial-card img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-bottom: 15px;
+        object-fit: cover;
+    }
+
+    .testimonial-card h6 {
+        font-weight: 600;
+    }
+
+    /* ---------- SALE CTA ---------- */
+    .sale-section {
+        background: #fff7e0;
+        padding: 80px 0;
+        text-align: center;
+    }
+
+    .sale-section img {
+        max-width: 220px;
+        margin-bottom: 20px;
+    }
+
+    .sale-section h2 {
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .sale-section .btn {
+        background: var(--accent);
+        color: #222;
+        border-radius: 30px;
+        padding: 12px 30px;
+        font-weight: 600;
+    }
+
+    footer {
+        background: var(--primary);
+        color: #eee;
+        text-align: center;
+        padding: 30px 0;
+        font-size: 0.9rem;
+    }
+
+    .ai-finder {
+        position: relative;
+        overflow: hidden;
+    }
+
+    #bg-animation {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+</style>
+
+<!-- HERO -->
+<section class="hero" data-aos="fade-in">
+    <div class="hero-content">
+        <h1>Make Your Interior More Minimalistic & Modern</h1>
+        <p>Turn your space into a more stylish and functional environment with our premium products.</p>
+        <a href="/shop" class="btn">Shop Now</a>
+    </div>
+</section>
+
+<!-- AI FINDER -->
+<section class="ai-finder" data-aos="zoom-in">
+    <canvas id="bg-animation"></canvas>
+    <h2>Find What You Need Instantly</h2>
+    <p>Type a description or upload a product image — our AI will help you find the perfect match.</p>
+    <form id="searchForm" method="POST" enctype="multipart/form-data" class="mt-4">
+        @csrf
+        <input type="text" name="query" placeholder="e.g. leather chair, wooden table">
+        <input type="file" name="image" accept="image/*">
+        <button type="submit">🔍 Search</button>
+    </form>
+</section>
+
+<!-- BENEFITS -->
+<section class="benefits">
+    <div class="container">
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-3" data-aos="fade-up">
+                <div class="icon"><i class="bi bi-truck"></i></div>
+                <h5>Free Services</h5>
+                <p>Save cost with our free delivery.</p>
             </div>
-            <div class="carousel-item hero-slide" style="background-image: url('/storage/images/slide2.jpg')">
-                <div class="carousel-caption" data-aos="fade-up">
-                    <h1>Modern Hardware, Modern Living</h1>
-                    <p>Find premium materials that fit your home and lifestyle.</p>
-                    <a href="/shop" class="btn btn-primary mt-3">Explore Products</a>
-                </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="100">
+                <div class="icon"><i class="bi bi-credit-card"></i></div>
+                <h5>Easy Payments</h5>
+                <p>Secure and fast online payments.</p>
             </div>
-            <div class="carousel-item hero-slide" style="background-image: url('/storage/images/slide3.jpg')">
-                <div class="carousel-caption" data-aos="fade-up">
-                    <h1>Precision in Every Piece</h1>
-                    <p>Trusted by builders, loved by homeowners.</p>
-                    <a href="/shop" class="btn btn-primary mt-3">View Collection</a>
-                </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="200">
+                <div class="icon"><i class="bi bi-arrow-repeat"></i></div>
+                <h5>Return Policy</h5>
+                <p>Return easily within 7 days.</p>
+            </div>
+            <div class="col-md-3" data-aos="fade-up" data-aos-delay="300">
+                <div class="icon"><i class="bi bi-shield-check"></i></div>
+                <h5>Warranty</h5>
+                <p>Products come with warranty support.</p>
             </div>
         </div>
-
-        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-        </button>
     </div>
+</section>
 
-    <!-- AI FINDER -->
-    <section class="ai-finder" data-aos="zoom-in">
-        <h2>Find What You Need Instantly</h2>
-        <p>Type a description or upload a product image — our AI will help you find the perfect match.</p>
-        <form id="searchForm" method="POST" enctype="multipart/form-data" class="mt-4">
-            @csrf
-            <input type="text" name="query" placeholder="e.g. white ceramic tile 12x12">
-            <input type="file" name="image" accept="image/*">
-            <button type="submit">🔍 Search</button>
-        </form>
-    </section>
-
-    <!-- MODAL RESULTS -->
-    <div class="modal fade" id="resultsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5>Search Results</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body" id="resultsContent">
-                    <p class="text-center text-muted py-5">Loading...</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- FEATURED PRODUCTS -->
-    <section class="products container" data-aos="fade-up">
-        <h2 class="text-center fw-bold mb-5">Featured Products</h2>
+<!-- FEATURED PRODUCTS -->
+<section class="products">
+    <div class="container">
+        <h2>See Our Quality Products</h2>
         <div class="row g-4">
             @foreach($latestProducts as $product)
-                <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
-                    <div class="product-card">
-                        <img src="/storage/{{ $product->image }}" alt="{{ $product->name }}">
-                        <div class="card-body">
-                            <h5>{{ $product->name }}</h5>
-                            <p>₱{{ number_format($product->price, 2) }}</p>
-                            @if ($product->quantity > 0)
-                                <p>Stock: {{ $product->quantity }}</p>
-                            @else
-                                <p class="text-danger fw-bold">Out of Stock</p>
-                            @endif
-                            <button class="btn mt-2" onclick="showLoadingAndRedirect({{ $product->id }})">View Details</button>
-                        </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ $loop->index * 100 }}">
+                <div class="product-card">
+                    <img src="/storage/{{ $product->image }}" alt="{{ $product->name }}">
+                    <div class="p-3">
+                        <h5>{{ $product->name }}</h5>
+                        <p>₱{{ number_format($product->price, 2) }}</p>
+                        <a href="/product/{{ $product->id }}" class="btn btn-sm btn-warning mt-2">View Details</a>
                     </div>
                 </div>
+            </div>
             @endforeach
         </div>
-    </section>
+    </div>
+</section>
 
-    <x-loading-overlay id="view-loading" />
 
-    <footer>
-        <div class="container">
-            <p>&copy; 2025 Queens Rebo Hardware. Built for quality and style.</p>
+<!-- TESTIMONIALS -->
+<section class="testimonials">
+    <div class="container">
+        <h2>Our Client Reviews</h2>
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-4" data-aos="fade-up">
+                <div class="testimonial-card">
+                    <img src="/storage/images/user1.jpg" alt="User">
+                    <h6>Bunga Ulin</h6>
+                    <p>"The products are high quality and delivery was fast! My living room looks amazing now."</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="testimonial-card">
+                    <img src="/storage/images/user2.jpg" alt="User">
+                    <h6>Rudi Suljam</h6>
+                    <p>"Superb craftsmanship and modern design. I’ll definitely order again."</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="testimonial-card">
+                    <img src="/storage/images/user3.jpg" alt="User">
+                    <h6>Impek Ino</h6>
+                    <p>"Excellent customer service and the furniture exceeded my expectations."</p>
+                </div>
+            </div>
         </div>
-    </footer>
+    </div>
+</section>
 
-    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
-    <script>
-        AOS.init({ duration: 1000, once: true });
+<!-- SALE CTA -->
+<section class="sale-section" data-aos="zoom-in">
+    <img src="/storage/images/yellow-chair.png" alt="Sale Chair">
+    <h2>World Best Sofas</h2>
+    <p>Sale Ends Very Soon</p>
+    <a href="/shop" class="btn">Order Now</a>
+</section>
 
-        const overlay = document.getElementById('view-loading');
+<footer>
+    <p>&copy; 2025 Queens Rebo Hardware — Designed for comfort and style.</p>
+</footer>
 
-        function showLoadingAndRedirect(id) {
-            overlay.classList.add('active');
-            setTimeout(() => { window.location.href = `/product/${id}`; }, 800);
-        }
+<script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+<script>
+AOS.init({ duration: 1000, once: true });
 
-        document.getElementById('searchForm').addEventListener('submit', e => {
-            e.preventDefault();
-            overlay.classList.add('active');
+// --- ENHANCED BACKGROUND ANIMATION ---
+const canvas = document.getElementById('bg-animation');
+const ctx = canvas.getContext('2d');
 
-            const formData = new FormData(e.target);
-            const imageFile = formData.get('image');
-            const action = imageFile && imageFile.name ? "{{ route('search.image') }}" : "{{ route('search.text') }}";
+// Resize canvas dynamically
+function resizeCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
 
-            fetch(action, {
-                method: 'POST',
-                headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-                body: formData
-            })
-                .then(res => res.text())
-                .then(html => {
-                    overlay.classList.remove('active');
-                    document.getElementById('resultsContent').innerHTML = html;
-                    new bootstrap.Modal(document.getElementById('resultsModal')).show();
-                })
-                .catch(() => {
-                    overlay.classList.remove('active');
-                    document.getElementById('resultsContent').innerHTML =
-                        '<p class="text-danger text-center">Error loading results.</p>';
-                });
+// Create particles
+let particles = [];
+const numParticles = 55; // more particles for denser effect
+
+function createParticles() {
+    particles = [];
+    for (let i = 0; i < numParticles; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            r: Math.random() * 4 + 2, // larger circles
+            dx: (Math.random() - 0.5) * 0.7, // slightly faster
+            dy: (Math.random() - 0.5) * 0.7
         });
-    </script>
+    }
+}
+createParticles();
+
+// Animate particles
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // brighter, more visible gold particles
+    ctx.fillStyle = "rgba(244,180,0,0.45)";
+
+    particles.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        p.x += p.dx;
+        p.y += p.dy;
+
+        // Bounce effect on edges
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+    });
+
+    requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+
 @endsection
