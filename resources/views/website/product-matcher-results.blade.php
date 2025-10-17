@@ -1,30 +1,37 @@
 <div class="container">
-    <h3>Results for "{{ $query }}"</h3>
-    <div class="row mt-3">
-        @forelse($products as $product)
-            <div class="col-md-3 mb-4">
-                <div class="card h-100">
-                <!-- Image wrapper -->
-                    <div style="height: 180px; overflow: hidden; border-top-left-radius: 10px; border-top-right-radius: 10px;">
-                        <img src="/storage/{{ $product->image }}" class="card-img-top" alt="{{ $product->name }}" style="width:100%; height:100%; object-fit: cover;">
-                    </div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $product->name }}</h5>
-                        <p class="card-text">{{ $product->description }}</p>
-                        <p class="fw-bold">₱@if($products->isEmpty())
-                            <p class="text-center">No matching products found for "{{ $query }}"</p>
-                        @else
-                            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+    <h3 class="text-center mb-4">Results for "{{ $query }}"</h3>
 
-                            </div>
-                        @endif
-                        {{ number_format($product->price, 2) }}</p>
-                        <a href="#" class="btn btn-sm btn-primary align-items-center text-center">View</a>
+    <div class="row g-4">
+        @forelse($products as $product)
+            <div class="col-md-4 d-flex">
+                <div class="product-card h-100 d-flex flex-column w-100">
+                    <!-- Fixed height image container -->
+                    <div style="height: 230px; overflow: hidden;">
+                        <img src="/storage/{{ $product->image }}" alt="{{ $product->name }}" class="w-100 h-100"
+                            style="object-fit: contain;">
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body d-flex flex-column justify-content-between flex-grow-1">
+                        <div>
+                            <h5>{{ $product->name }}</h5>
+                            <p class="mb-1">₱{{ number_format($product->price, 2) }}</p>
+                            @if ($product->quantity > 0)
+                                <p class="text-success mb-2">Stock: {{ $product->quantity }}</p>
+                            @else
+                                <p class="text-danger fw-bold mb-2">Out of Stock</p>
+                            @endif
+                        </div>
+                        <button class="btn mt-auto" onclick="showLoadingAndRedirect({{ $product->id }})">
+                            View Details
+                        </button>
                     </div>
                 </div>
             </div>
         @empty
-            <p>No matching products found.</p>
+            <div class="col-12 text-center text-muted py-5">
+                <p>No matching products found for "{{ $query }}".</p>
+            </div>
         @endforelse
     </div>
 </div>

@@ -225,6 +225,14 @@
             background-color: #e2a800;
         }
 
+        .product-card img {
+            width: 100%;
+            height: auto;
+            max-height: 230px;
+            object-fit: contain;
+        }
+
+
         /* --- FOOTER --- */
         footer {
             background-color: var(--primary);
