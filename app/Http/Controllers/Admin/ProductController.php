@@ -4,9 +4,17 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Services\EmbeddingService;
 
 class ProductController extends Controller
 {
+
+    protected $embeddingService;
+
+    public function __construct(EmbeddingService $embeddingService)
+    {
+        $this->embeddingService = $embeddingService;
+    }
     public function index()
     {
         $products = Product::paginate(10);
@@ -49,6 +57,18 @@ class ProductController extends Controller
 
         $product->save();
 
+        try {
+            $embedding = $this->embeddingService->embedText($this->buildEmbeddingText($product));
+            $product->embedding = $embedding;
+            $product->save();
+        } catch (\Throwable $e) {
+            \Log::warning('Embedding failed on create', [
+                'product_id' => $product->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
+
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully!');
     }
 
@@ -88,6 +108,18 @@ class ProductController extends Controller
 
         $product->save();
 
+        try {
+            $embedding = $this->embeddingService->embedText($this->buildEmbeddingText($product));
+            $product->embedding = $embedding;
+            $product->save();
+        } catch (\Throwable $e) {
+            \Log::warning('Embedding failed on update', [
+                'product_id' => $product->id,
+                'error' => $e->getMessage()
+            ]);
+        }
+
+
         return redirect()->route('admin.products.index')->with('success', 'Product updated successfully!');
     }
 
@@ -97,4 +129,19 @@ class ProductController extends Controller
 
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully!');
     }
+
+    private function buildEmbeddingText(Product $product): string
+    {
+        return collect([
+            'Name: ' . $product->name,
+            'SKU: ' . $product->sku,
+            'Description: ' . $product->description,
+            'Category: ' . $product->category,
+            'Price: ' . $product->price,
+            'Quantity: ' . $product->quantity,
+        ])->filter()->implode("\n");
+    }
+
 }
+
+
