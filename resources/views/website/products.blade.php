@@ -15,10 +15,40 @@
   --white: #ffffff;
 }
 
+/* ---------- BASE ---------- */
 body {
   background-color: var(--bg);
   color: var(--text);
   font-family: 'Poppins', sans-serif;
+}
+
+/* ---------- FULL PAGE LOADER ---------- */
+#page-loader {
+  position: fixed;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+#page-loader.active {
+  opacity: 1;
+  visibility: visible;
+}
+.spinner {
+  width: 70px;
+  height: 70px;
+  border: 6px solid #ccc;
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* -------- FILTER SIDEBAR -------- */
@@ -80,22 +110,18 @@ body {
   border-radius: 12px;
   transition: 0.25s;
 }
-
 #category-filter-form .btn-outline-primary {
   border: 2px solid var(--accent);
   color: var(--primary);
 }
-
 #category-filter-form .btn-outline-primary:hover {
   background: var(--accent);
   color: var(--primary);
 }
-
 #category-filter-form .btn-outline-danger {
   border: 2px solid #dc2626;
   color: #dc2626;
 }
-
 #category-filter-form .btn-outline-danger:hover {
   background: #dc2626;
   color: #fff;
@@ -114,38 +140,31 @@ body {
   overflow: hidden;
   height: 100%;
 }
-
 .product-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 8px 25px var(--shadow);
 }
-
 .product-card img {
   height: 250px;
   width: 100%;
   object-fit: cover;
   background: #f2f2f2;
 }
-
 .product-card .card-body {
   text-align: center;
   padding: 22px 16px;
 }
-
 .product-card h5 {
   color: var(--primary);
   font-weight: 700;
   font-size: 1.05rem;
   text-transform: uppercase;
 }
-
 .product-card p {
   color: var(--gray);
   margin-bottom: 5px;
   font-size: 0.9rem;
 }
-
-/* Buttons inside product cards */
 .product-card .btn {
   background: var(--accent);
   color: var(--primary);
@@ -156,7 +175,6 @@ body {
   transition: 0.3s ease;
   box-shadow: 0 3px 10px var(--shadow);
 }
-
 .product-card .btn:hover {
   background: #e2a800;
   color: #000;
@@ -171,7 +189,6 @@ body {
   border: 1.5px solid var(--border);
   box-shadow: 0 2px 6px var(--shadow);
 }
-
 .sort-select:focus {
   border-color: var(--accent);
   box-shadow: 0 0 6px rgba(244, 180, 0, 0.4);
@@ -183,14 +200,12 @@ body {
   border-radius: 8px;
   border: 1px solid #dee2e6;
 }
-
 .pagination-container .page-item.active .page-link {
   background-color: var(--accent);
   border-color: var(--accent);
   color: var(--primary);
   font-weight: 600;
 }
-
 .pagination-container .page-link:hover {
   background-color: var(--primary);
   color: #fff;
@@ -200,6 +215,9 @@ body {
   .filter-card { margin-bottom: 25px; }
 }
 </style>
+
+<!-- FULL PAGE LOADER -->
+<div id="page-loader"><div class="spinner"></div></div>
 
 <section class="shop-products container" data-aos="fade-up">
   <div class="row g-4">
@@ -279,17 +297,17 @@ body {
           @if ($products->onFirstPage())
             <li class="page-item disabled"><span class="page-link">« Prev</span></li>
           @else
-            <li class="page-item"><a href="{{ $products->previousPageUrl() }}" class="page-link">« Prev</a></li>
+            <li class="page-item"><a href="{{ $products->previousPageUrl() }}" class="page-link action-link">« Prev</a></li>
           @endif
 
           @for ($i = 1; $i <= $products->lastPage(); $i++)
             <li class="page-item {{ $i == $products->currentPage() ? 'active' : '' }}">
-              <a href="{{ $products->url($i) }}" class="page-link">{{ $i }}</a>
+              <a href="{{ $products->url($i) }}" class="page-link action-link">{{ $i }}</a>
             </li>
           @endfor
 
           @if ($products->hasMorePages())
-            <li class="page-item"><a href="{{ $products->nextPageUrl() }}" class="page-link">Next »</a></li>
+            <li class="page-item"><a href="{{ $products->nextPageUrl() }}" class="page-link action-link">Next »</a></li>
           @else
             <li class="page-item disabled"><span class="page-link">Next »</span></li>
           @endif
@@ -299,21 +317,25 @@ body {
   </div>
 </section>
 
-<x-loading-overlay id="view-loading" />
-
 <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
 <script>
 AOS.init({ duration: 900, once: true });
 
-function showLoading() {
-  document.getElementById('view-loading').classList.add('active');
-}
+const pageLoader = document.getElementById('page-loader');
+function showLoading() { pageLoader.classList.add('active'); }
+function hideLoading() { pageLoader.classList.remove('active'); }
 
 function showLoadingAndRedirect(id) {
   showLoading();
-  setTimeout(() => window.location.href = `/product/${id}`, 800);
+  setTimeout(() => window.location.href = `/product/${id}`, 700);
 }
 
+// Apply loader to pagination and action links
+document.querySelectorAll('.action-link').forEach(link => {
+  link.addEventListener('click', () => showLoading());
+});
+
+// Sort change
 document.getElementById('sort').addEventListener('change', function () {
   showLoading();
   const url = new URL(window.location.href);
@@ -322,6 +344,7 @@ document.getElementById('sort').addEventListener('change', function () {
   window.location.href = url.toString();
 });
 
+// Filter form
 document.getElementById('category-filter-form').addEventListener('submit', function (e) {
   e.preventDefault();
   showLoading();
@@ -335,6 +358,7 @@ document.getElementById('category-filter-form').addEventListener('submit', funct
   window.location.href = url.toString();
 });
 
+// Clear filters
 document.getElementById('clear-filters').addEventListener('click', function () {
   showLoading();
   const url = new URL(window.location.href);

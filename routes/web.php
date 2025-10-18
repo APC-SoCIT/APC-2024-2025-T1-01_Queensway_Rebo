@@ -25,6 +25,7 @@ use App\Http\Controllers\Website\WebsiteCheckoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\Auth\UnifiedAuthController;
 use App\Http\Controllers\Auth\UnifiedForgotPasswordController;
+use App\Http\Controllers\Website\WebsiteReviewController;
 
 // ==============================
 // 🌐 PUBLIC ROUTES
@@ -190,4 +191,8 @@ Route::get('/order/{order}/invoice', [OrderController::class, 'viewInvoice'])->n
 
 // Admin Dashboard Data
 Route::get('/admin/dashboard/sales-data', [AdminDashboardController::class, 'salesData'])->name('admin.dashboard.salesData');
+
+Route::post('/reviews', [WebsiteReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
+
+Route::post('/ai-finder', [WebsiteSearchController::class, 'handleAiFinder'])->name('ai.finder');
 

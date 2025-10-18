@@ -2,9 +2,7 @@
 <style>
     :root {
         --primary: #004b8d;
-        /* Deep AI Blue */
         --accent: #f4b400;
-        /* Gold Accent */
         --light-beige: #e1ddd1;
         --soft-blue: #add8e6;
         --deep-blue: #2608bd;
@@ -17,8 +15,10 @@
     .navbar-custom {
         background: linear-gradient(90deg, var(--light-beige) 0%, var(--soft-blue) 100%);
         box-shadow: 0 4px 10px var(--nav-shadow);
-        transition: all 0.3s ease;
         padding: 0.8rem 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1000;
     }
 
     .navbar-custom.scrolled {
@@ -34,6 +34,12 @@
         letter-spacing: 0.5px;
         display: flex;
         align-items: center;
+    }
+
+    .navbar-brand img {
+        height: 70px;
+        width: auto;
+        object-fit: contain;
     }
 
     .navbar-brand:hover {
@@ -78,7 +84,6 @@
     .nav-link.dropdown-toggle::after {
         display: none !important;
     }
-
 
     /* DROPDOWN MENU */
     .dropdown-menu {
@@ -125,14 +130,36 @@
 
     /* USER MENU ICON */
     #userMenu {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
         color: var(--primary);
         transition: 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: rgba(244, 180, 0, 0.15);
     }
 
     #userMenu:hover {
         color: var(--accent);
+        background-color: rgba(244, 180, 0, 0.25);
         transform: translateY(-1px);
+    }
+
+    /* TOGGLER BUTTON */
+    .navbar-toggler {
+        border: none;
+        outline: none;
+    }
+
+    .navbar-toggler:focus {
+        box-shadow: none;
+    }
+
+    .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(0,75,141, 1)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
     }
 
     /* RESPONSIVE */
@@ -143,34 +170,40 @@
 
         .navbar-nav {
             text-align: center;
+            margin-top: 10px;
         }
 
         .nav-link {
             padding: 10px 0;
         }
+
+        #userMenu {
+            margin: 0 auto;
+        }
     }
 </style>
 
-
 <nav class="navbar navbar-expand-lg navbar-light navbar-custom">
     <div class="container">
-        <!-- Centered logo -->
-        <div class="container justify-content-center">
-            <a class="navbar-brand mx-auto" href="{{ url('/') }}">
-                <img src="{{ asset('storage/images/logo.png') }}" alt="Logo"
-                    style="width: 95px; height: 70px; object-fit: contain;">
-            </a>
-        </div>
 
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="/">Home</a>
-                </li>
+        <!-- Brand / Logo -->
+        <a class="navbar-brand" href="{{ url('/') }}">
+            <img src="{{ asset('storage/images/logo.png') }}" alt="Logo">
+        </a>
 
-                <li class="nav-item">
-                    <a class="nav-link" href="/shop">Shop</a>
-                </li>
+        <!-- Hamburger Menu -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Menu Items -->
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav align-items-center">
+
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+
+                <li class="nav-item"><a class="nav-link" href="/shop">Shop</a></li>
 
                 <!-- Tools Dropdown -->
                 <li class="nav-item dropdown">
@@ -192,7 +225,7 @@
                 @endguest
 
                 @auth
-                    <!-- Cart Link with Red Badge -->
+                    <!-- Cart -->
                     <li class="nav-item">
                         <a class="nav-link position-relative d-flex align-items-center" href="/cart">
                             Cart
@@ -202,25 +235,19 @@
                                 {{ $count }}
                             </span>
                         </a>
-
                     </li>
 
                     <!-- User Dropdown -->
                     <li class="nav-item dropdown">
-                        <a class="nav-link" href="#" id="userMenu" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
-                            <span style="font-size: 1.25rem; line-height: 1;">&#128100;</span>
+                        <a class="nav-link d-flex align-items-center justify-content-center" href="#" id="userMenu"
+                            role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-fill"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                            <li>
-                                <a class="dropdown-item" href="{{ url('user/dashboard') }}">🏠 Home</a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item" href="/user/account-info">
+                            <li><a class="dropdown-item" href="{{ url('user/dashboard') }}">🏠 Home</a></li>
+                            <li><a class="dropdown-item" href="/user/account-info">
                                     👤 {{ Auth::user()->first_name }} {{ Auth::user()->last_name }}
-                                </a>
-
-                            </li>
+                                </a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>

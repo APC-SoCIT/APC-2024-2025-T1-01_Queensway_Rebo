@@ -120,4 +120,18 @@ class WebsiteSearchController extends Controller
 
         return $magA && $magB ? $dot / (sqrt($magA) * sqrt($magB)) : 0;
     }
+
+    public function handleAiFinder(Request $request)
+    {
+        if ($request->hasFile('image')) {
+            $html = $this->searchImage($request);
+        } elseif ($request->filled('query')) {
+            $html = $this->searchText($request);
+        } else {
+            return response()->json(['error' => 'Please enter a query or upload an image.'], 400);
+        }
+
+        return response()->json(['html' => $html]);
+    }
+
 }

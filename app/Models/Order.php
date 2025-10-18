@@ -39,4 +39,10 @@ class Order extends Model
     {
         return 'order_number';
     }
+
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
+
 }

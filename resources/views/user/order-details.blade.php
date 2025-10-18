@@ -43,10 +43,11 @@
             background-color: #28a745;
             width:
                 {{ 
-                $order->order_status === 'shipped' ? '100%' :
+                    $order->order_status === 'shipped' ? '100%' :
         ($order->order_status === 'preparing' ? '66%' :
             ($order->order_status === 'paid' ? '33%' : '0%')) 
-            }};
+                }}
+            ;
             transition: width 0.3s ease;
         }
 
@@ -117,7 +118,8 @@
                     <h5>Order Details</h5>
                     <p><strong>Date Ordered:</strong> {{ $order->created_at->format('F j, Y') }}</p>
                     <p><strong>Order Number:</strong> {{ $order->order_number ?? $order->id }}</p>
-                    <a href="{{ route('order.invoice', $order->order_number) }}" target="_blank" class="btn btn-outline-secondary">
+                    <a href="{{ route('order.invoice', $order->order_number) }}" target="_blank"
+                        class="btn btn-outline-secondary">
                         View Invoice
                     </a>
                 </div>
@@ -195,6 +197,44 @@
                         @endforeach
                     </ul>
                 </div>
+
+                <!-- Review Section -->
+                <div class="section-box mt-4">
+                    <h5>Leave a Review</h5>
+
+                    @if ($order->review)
+                        <div class="alert alert-success">
+                            <strong>Thank you!</strong> You already left feedback for this order.
+                        </div>
+                        <p><strong>Your Review:</strong> {{ $order->review->feedback }}</p>
+                        @if($order->review->rating)
+                            <p><strong>Rating:</strong> ⭐ {{ $order->review->rating }}/5</p>
+                        @endif
+                    @else
+                        <form action="{{ route('reviews.store') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="order_id" value="{{ $order->id }}">
+
+                            <div class="form-group mb-3">
+                                <label for="rating">Rating (1–5):</label>
+                                <select name="rating" id="rating" class="form-control" required>
+                                    <option value="">Select</option>
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        <option value="{{ $i }}">{{ $i }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="feedback">Your Feedback:</label>
+                                <textarea name="feedback" id="feedback" rows="3" class="form-control" required></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-success">Submit Review</button>
+                        </form>
+                    @endif
+                </div>
+
             </div>
         </div>
     </div>
